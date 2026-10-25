@@ -1,0 +1,1738 @@
+[
+  {
+    "service_id": "plb_drain_cleaning",
+    "category": "plumbing",
+    "name": "Drain cleaning",
+    "common_name": "drain cleaning",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 150,
+    "market_price_high_usd": 375,
+    "typical_duration": "1-2 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "clogged drain",
+      "snaking",
+      "drain snake"
+    ],
+    "common_problems": [
+      "the kitchen sink kept backing up",
+      "the shower drain was barely draining",
+      "the main line backed up into the tub"
+    ],
+    "typical_work": [
+      "snaked the line and cleared a grease clog",
+      "cleared the drain and showed us the gunk that came out"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "plb_hydro_jetting",
+    "category": "plumbing",
+    "name": "Hydro jetting",
+    "common_name": "hydro jetting",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 350,
+    "market_price_high_usd": 850,
+    "typical_duration": "2-4 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "jetting",
+      "hydrojet"
+    ],
+    "common_problems": [
+      "roots kept clogging our sewer line",
+      "we had recurring backups every few months"
+    ],
+    "typical_work": [
+      "hydro-jetted the main line and ran a camera through it afterwards"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "plb_water_heater_tank",
+    "category": "plumbing",
+    "name": "Tank water heater replacement",
+    "common_name": "water heater replacement",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 1600,
+    "market_price_high_usd": 3400,
+    "typical_duration": "3-6 hours",
+    "permit_typically_required": true,
+    "aliases": [
+      "water heater",
+      "hot water heater",
+      "tank heater"
+    ],
+    "common_problems": [
+      "our water heater started leaking in the garage",
+      "we had no hot water",
+      "the 15-year-old water heater finally died"
+    ],
+    "typical_work": [
+      "replaced the 50-gallon gas water heater and brought the venting up to code",
+      "hauled off the old tank and installed a new one with an expansion tank"
+    ],
+    "peak_months": [
+      1,
+      2,
+      12
+    ]
+  },
+  {
+    "service_id": "plb_tankless_install",
+    "category": "plumbing",
+    "name": "Tankless water heater installation",
+    "common_name": "tankless water heater",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 3800,
+    "market_price_high_usd": 7200,
+    "typical_duration": "1 day",
+    "permit_typically_required": true,
+    "aliases": [
+      "tankless",
+      "on-demand water heater"
+    ],
+    "common_problems": [
+      "we wanted to switch to tankless",
+      "our old tank kept running out of hot water"
+    ],
+    "typical_work": [
+      "installed a tankless unit, upsized the gas line and set up a recirculation pump"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "plb_leak_detection",
+    "category": "plumbing",
+    "name": "Leak detection",
+    "common_name": "leak detection",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 250,
+    "market_price_high_usd": 650,
+    "typical_duration": "1-3 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "leak",
+      "water leak"
+    ],
+    "common_problems": [
+      "our water bill doubled out of nowhere",
+      "we heard water running behind the wall",
+      "there was a warm spot on the floor"
+    ],
+    "typical_work": [
+      "found the leak with acoustic equipment without tearing up the floor",
+      "pinpointed a pinhole leak in the wall"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "plb_slab_leak_repair",
+    "category": "plumbing",
+    "name": "Slab leak repair",
+    "common_name": "slab leak repair",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 2200,
+    "market_price_high_usd": 6500,
+    "typical_duration": "1-2 days",
+    "permit_typically_required": true,
+    "aliases": [
+      "slab leak",
+      "foundation leak"
+    ],
+    "common_problems": [
+      "we had a slab leak under the kitchen",
+      "the floor was wet and warm near the hallway"
+    ],
+    "typical_work": [
+      "rerouted the hot water line through the attic instead of jackhammering the slab",
+      "tunneled under the slab to fix the break"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "plb_toilet",
+    "category": "plumbing",
+    "name": "Toilet repair or installation",
+    "common_name": "toilet repair",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 225,
+    "market_price_high_usd": 650,
+    "typical_duration": "1-2 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "toilet",
+      "running toilet"
+    ],
+    "common_problems": [
+      "our toilet kept running all night",
+      "the toilet was rocking and leaking at the base"
+    ],
+    "typical_work": [
+      "replaced the fill valve and flapper",
+      "replaced the wax ring and flange and reset the toilet"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "plb_fixture_install",
+    "category": "plumbing",
+    "name": "Faucet, sink or disposal installation",
+    "common_name": "faucet install",
+    "pricing_model": "per_unit",
+    "unit": "fixture",
+    "market_price_low_usd": 175,
+    "market_price_high_usd": 450,
+    "typical_duration": "1-2 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "faucet",
+      "garbage disposal",
+      "sink"
+    ],
+    "common_problems": [
+      "we bought a new kitchen faucet",
+      "the garbage disposal stopped working"
+    ],
+    "typical_work": [
+      "installed the new faucet and replaced the corroded shutoff valves",
+      "swapped in a new disposal"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "plb_sewer_camera",
+    "category": "plumbing",
+    "name": "Sewer camera inspection",
+    "common_name": "sewer camera inspection",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 225,
+    "market_price_high_usd": 475,
+    "typical_duration": "1-2 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "camera inspection",
+      "sewer scope"
+    ],
+    "common_problems": [
+      "we were buying a 1960s house and wanted the sewer line checked",
+      "we had a sewer smell in the yard"
+    ],
+    "typical_work": [
+      "ran a camera down the line and sent us the video",
+      "located a belly in the cast iron line"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "plb_sewer_replacement",
+    "category": "plumbing",
+    "name": "Sewer line replacement",
+    "common_name": "sewer line replacement",
+    "pricing_model": "per_linear_ft",
+    "unit": "linear ft",
+    "market_price_low_usd": 110,
+    "market_price_high_usd": 260,
+    "typical_duration": "2-4 days",
+    "permit_typically_required": true,
+    "aliases": [
+      "sewer line",
+      "main line replacement"
+    ],
+    "common_problems": [
+      "our cast iron sewer line collapsed",
+      "roots had destroyed the clay sewer pipe"
+    ],
+    "typical_work": [
+      "replaced the line with PVC and handled the city permit and inspection"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "plb_repipe",
+    "category": "plumbing",
+    "name": "Whole-house repipe",
+    "common_name": "repipe",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 5500,
+    "market_price_high_usd": 16000,
+    "typical_duration": "2-5 days",
+    "permit_typically_required": true,
+    "aliases": [
+      "repipe",
+      "PEX"
+    ],
+    "common_problems": [
+      "we kept getting pinhole leaks in our old copper",
+      "the house still had galvanized pipes"
+    ],
+    "typical_work": [
+      "repiped the whole house in PEX and patched the drywall afterwards"
+    ],
+    "peak_months": [
+      1,
+      2
+    ]
+  },
+  {
+    "service_id": "plb_gas_line",
+    "category": "plumbing",
+    "name": "Gas line installation or repair",
+    "common_name": "gas line work",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 350,
+    "market_price_high_usd": 2200,
+    "typical_duration": "half day",
+    "permit_typically_required": true,
+    "aliases": [
+      "gas leak",
+      "gas line"
+    ],
+    "common_problems": [
+      "we smelled gas near the stove",
+      "we needed a gas line run for an outdoor kitchen"
+    ],
+    "typical_work": [
+      "pressure-tested the gas system and repaired the leaking fitting",
+      "ran a new gas line to the patio"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "plb_water_softener",
+    "category": "plumbing",
+    "name": "Water softener or filtration installation",
+    "common_name": "water softener install",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 1400,
+    "market_price_high_usd": 3600,
+    "typical_duration": "half day",
+    "permit_typically_required": false,
+    "aliases": [
+      "water softener",
+      "filtration"
+    ],
+    "common_problems": [
+      "the hard water was ruining our fixtures",
+      "we wanted whole-house filtration"
+    ],
+    "typical_work": [
+      "installed a softener loop and whole-house filter"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "plb_emergency",
+    "category": "plumbing",
+    "name": "Emergency plumbing call",
+    "common_name": "emergency plumbing call",
+    "pricing_model": "per_visit",
+    "unit": "visit",
+    "market_price_low_usd": 175,
+    "market_price_high_usd": 350,
+    "typical_duration": "1-2 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "emergency plumber",
+      "burst pipe",
+      "frozen pipe"
+    ],
+    "common_problems": [
+      "a pipe burst in the attic during the freeze",
+      "water was pouring out from under the sink at 11pm"
+    ],
+    "typical_work": [
+      "came out the same night, shut off the water and fixed the burst pipe"
+    ],
+    "peak_months": [
+      1,
+      2
+    ]
+  },
+  {
+    "service_id": "ele_troubleshooting",
+    "category": "electrical",
+    "name": "Electrical troubleshooting and repair",
+    "common_name": "electrical repair",
+    "pricing_model": "hourly",
+    "unit": "hour",
+    "market_price_low_usd": 95,
+    "market_price_high_usd": 165,
+    "typical_duration": "1-3 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "breaker tripping",
+      "flickering lights",
+      "dead outlet"
+    ],
+    "common_problems": [
+      "half the outlets in the living room went dead",
+      "a breaker kept tripping",
+      "the lights were flickering"
+    ],
+    "typical_work": [
+      "traced the problem to a loose backstabbed outlet",
+      "found a failing breaker and replaced it",
+      "found a loose neutral at the panel that was causing the flicker"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "ele_panel_upgrade",
+    "category": "electrical",
+    "name": "Electrical panel upgrade",
+    "common_name": "electrical panel upgrade",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 2400,
+    "market_price_high_usd": 5200,
+    "typical_duration": "1 day",
+    "permit_typically_required": true,
+    "aliases": [
+      "panel",
+      "breaker box",
+      "200 amp",
+      "service upgrade"
+    ],
+    "common_problems": [
+      "our house had an old Federal Pacific panel",
+      "we needed a 200 amp panel for an EV and a pool"
+    ],
+    "typical_work": [
+      "swapped the old panel for a 200 amp panel and coordinated with Austin Energy",
+      "upgraded the service and labeled every circuit"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "ele_ev_charger",
+    "category": "electrical",
+    "name": "EV charger installation",
+    "common_name": "ev charger installation",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 900,
+    "market_price_high_usd": 2600,
+    "typical_duration": "half day",
+    "permit_typically_required": true,
+    "aliases": [
+      "EV charger",
+      "Tesla charger",
+      "level 2",
+      "240v outlet"
+    ],
+    "common_problems": [
+      "we bought an EV and needed a Level 2 charger",
+      "we needed a 240V outlet in the garage"
+    ],
+    "typical_work": [
+      "ran a 60 amp circuit and mounted the wall charger",
+      "installed a NEMA 14-50 in the garage"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "ele_outlet_switch",
+    "category": "electrical",
+    "name": "Outlet and switch installation",
+    "common_name": "outlet install",
+    "pricing_model": "per_unit",
+    "unit": "device",
+    "market_price_low_usd": 125,
+    "market_price_high_usd": 325,
+    "typical_duration": "1-3 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "outlet",
+      "switch",
+      "dimmer"
+    ],
+    "common_problems": [
+      "we wanted more outlets in the home office",
+      "we needed USB outlets and dimmers"
+    ],
+    "typical_work": [
+      "added outlets and swapped switches for dimmers"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "ele_gfci_code",
+    "category": "electrical",
+    "name": "GFCI/AFCI code corrections",
+    "common_name": "inspection repairs",
+    "pricing_model": "per_unit",
+    "unit": "device",
+    "market_price_low_usd": 150,
+    "market_price_high_usd": 300,
+    "typical_duration": "half day",
+    "permit_typically_required": false,
+    "aliases": [
+      "GFCI",
+      "inspection repairs",
+      "code corrections"
+    ],
+    "common_problems": [
+      "our home inspection flagged missing GFCI outlets",
+      "the buyer's inspector wrote up the wiring"
+    ],
+    "typical_work": [
+      "fixed every item on the inspection report and gave us documentation"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "ele_ceiling_fan",
+    "category": "electrical",
+    "name": "Ceiling fan installation",
+    "common_name": "ceiling fan installation",
+    "pricing_model": "per_unit",
+    "unit": "fan",
+    "market_price_low_usd": 175,
+    "market_price_high_usd": 475,
+    "typical_duration": "1-3 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "ceiling fan",
+      "fan install"
+    ],
+    "common_problems": [
+      "we wanted ceiling fans in the bedrooms",
+      "our patio needed a fan for the summer"
+    ],
+    "typical_work": [
+      "installed fans with new fan-rated boxes"
+    ],
+    "peak_months": [
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  {
+    "service_id": "ele_recessed_lighting",
+    "category": "electrical",
+    "name": "Recessed lighting installation",
+    "common_name": "recessed lighting installation",
+    "pricing_model": "per_unit",
+    "unit": "fixture",
+    "market_price_low_usd": 175,
+    "market_price_high_usd": 375,
+    "typical_duration": "1 day",
+    "permit_typically_required": false,
+    "aliases": [
+      "can lights",
+      "recessed lights",
+      "pot lights"
+    ],
+    "common_problems": [
+      "the living room was too dark",
+      "we wanted can lights in the kitchen"
+    ],
+    "typical_work": [
+      "installed LED wafer lights with minimal drywall damage"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "ele_generator",
+    "category": "electrical",
+    "name": "Whole-home standby generator installation",
+    "common_name": "standby generator",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 9500,
+    "market_price_high_usd": 19000,
+    "typical_duration": "1-3 days",
+    "permit_typically_required": true,
+    "aliases": [
+      "generator",
+      "standby generator",
+      "transfer switch"
+    ],
+    "common_problems": [
+      "after the freeze we wanted a standby generator",
+      "we lost power for four days and never wanted that again"
+    ],
+    "typical_work": [
+      "installed a standby generator with an automatic transfer switch and handled permits"
+    ],
+    "peak_months": [
+      1,
+      2
+    ]
+  },
+  {
+    "service_id": "ele_rewire",
+    "category": "electrical",
+    "name": "Whole-house rewiring",
+    "common_name": "rewiring",
+    "pricing_model": "per_sqft",
+    "unit": "sq ft",
+    "market_price_low_usd": 4.5,
+    "market_price_high_usd": 11,
+    "typical_duration": "3-7 days",
+    "permit_typically_required": true,
+    "aliases": [
+      "rewire",
+      "knob and tube",
+      "aluminum wiring"
+    ],
+    "common_problems": [
+      "our 1950s house still had knob-and-tube wiring",
+      "insurance wouldn't cover the old wiring"
+    ],
+    "typical_work": [
+      "rewired the whole house and patched every hole"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "ele_surge",
+    "category": "electrical",
+    "name": "Whole-home surge protection",
+    "common_name": "surge protector",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 350,
+    "market_price_high_usd": 850,
+    "typical_duration": "1-2 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "surge protector"
+    ],
+    "common_problems": [
+      "a lightning storm fried our TV",
+      "we wanted surge protection after the outage"
+    ],
+    "typical_work": [
+      "installed a whole-home surge protector at the panel"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "ele_landscape_lighting",
+    "category": "electrical",
+    "name": "Landscape and outdoor lighting",
+    "common_name": "outdoor lighting",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 1800,
+    "market_price_high_usd": 6500,
+    "typical_duration": "1-2 days",
+    "permit_typically_required": false,
+    "aliases": [
+      "outdoor lighting",
+      "landscape lighting",
+      "uplighting"
+    ],
+    "common_problems": [
+      "we wanted the front yard lit up at night",
+      "the patio had no lighting"
+    ],
+    "typical_work": [
+      "installed low-voltage path and uplighting on a timer"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "ele_smart_home",
+    "category": "electrical",
+    "name": "Smart switches and lighting control",
+    "common_name": "smart switch install",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 400,
+    "market_price_high_usd": 2500,
+    "typical_duration": "1 day",
+    "permit_typically_required": false,
+    "aliases": [
+      "smart switches",
+      "smart home"
+    ],
+    "common_problems": [
+      "we wanted smart switches throughout the house",
+      "we wanted lights we could control from our phones"
+    ],
+    "typical_work": [
+      "installed smart switches and set up scenes in the app"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "hvac_ac_diagnostic",
+    "category": "hvac",
+    "name": "AC diagnostic visit",
+    "common_name": "AC service call",
+    "pricing_model": "flat",
+    "unit": "visit",
+    "market_price_low_usd": 89,
+    "market_price_high_usd": 189,
+    "typical_duration": "1 hour",
+    "permit_typically_required": false,
+    "aliases": [
+      "AC not cooling",
+      "service call",
+      "diagnostic fee"
+    ],
+    "common_problems": [
+      "the AC was blowing warm air",
+      "the AC stopped cooling in the middle of July",
+      "the outdoor unit wasn't running"
+    ],
+    "typical_work": [
+      "diagnosed the problem within an hour"
+    ],
+    "peak_months": [
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  {
+    "service_id": "hvac_ac_repair",
+    "category": "hvac",
+    "name": "AC repair",
+    "common_name": "AC repair",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 250,
+    "market_price_high_usd": 1500,
+    "typical_duration": "1-4 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "AC repair",
+      "capacitor",
+      "refrigerant leak",
+      "freon"
+    ],
+    "common_problems": [
+      "the AC quit on a 105 degree day",
+      "ice was building up on the AC lines",
+      "the condenser fan stopped spinning"
+    ],
+    "typical_work": [
+      "replaced the capacitor and contactor",
+      "found and repaired a refrigerant leak at the coil",
+      "replaced the condenser fan motor"
+    ],
+    "peak_months": [
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  {
+    "service_id": "hvac_tune_up",
+    "category": "hvac",
+    "name": "AC or furnace tune-up",
+    "common_name": "AC tune-up",
+    "pricing_model": "flat",
+    "unit": "visit",
+    "market_price_low_usd": 89,
+    "market_price_high_usd": 199,
+    "typical_duration": "1 hour",
+    "permit_typically_required": false,
+    "aliases": [
+      "tune-up",
+      "maintenance",
+      "AC check"
+    ],
+    "common_problems": [
+      "we wanted the system checked before summer",
+      "it was time for the annual tune-up"
+    ],
+    "typical_work": [
+      "cleaned the coils, checked refrigerant and flushed the drain line"
+    ],
+    "peak_months": [
+      4,
+      5
+    ]
+  },
+  {
+    "service_id": "hvac_ac_replacement",
+    "category": "hvac",
+    "name": "Central AC system replacement",
+    "common_name": "new AC system",
+    "pricing_model": "flat",
+    "unit": "system",
+    "market_price_low_usd": 7500,
+    "market_price_high_usd": 16500,
+    "typical_duration": "1-2 days",
+    "permit_typically_required": true,
+    "aliases": [
+      "new AC",
+      "AC replacement",
+      "new system",
+      "condenser replacement"
+    ],
+    "common_problems": [
+      "our 18-year-old AC finally died",
+      "the AC needed R-22 refrigerant we couldn't get anymore",
+      "the system couldn't keep up with the heat"
+    ],
+    "typical_work": [
+      "replaced the condenser, coil and furnace with a high-efficiency system",
+      "did a load calculation and installed a properly sized 4-ton system"
+    ],
+    "peak_months": [
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  {
+    "service_id": "hvac_heat_pump",
+    "category": "hvac",
+    "name": "Heat pump installation",
+    "common_name": "heat pump",
+    "pricing_model": "flat",
+    "unit": "system",
+    "market_price_low_usd": 9000,
+    "market_price_high_usd": 19000,
+    "typical_duration": "1-2 days",
+    "permit_typically_required": true,
+    "aliases": [
+      "heat pump"
+    ],
+    "common_problems": [
+      "we wanted to go electric with a heat pump",
+      "our gas furnace and AC were both at end of life"
+    ],
+    "typical_work": [
+      "installed a variable-speed heat pump and walked us through the rebates"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "hvac_furnace_repair",
+    "category": "hvac",
+    "name": "Furnace or heating repair",
+    "common_name": "furnace repair",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 200,
+    "market_price_high_usd": 1200,
+    "typical_duration": "1-3 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "furnace",
+      "no heat",
+      "heater repair"
+    ],
+    "common_problems": [
+      "the heat stopped working during a cold snap",
+      "the furnace was short cycling"
+    ],
+    "typical_work": [
+      "replaced the flame sensor and igniter",
+      "fixed the inducer motor"
+    ],
+    "peak_months": [
+      1,
+      2,
+      12
+    ]
+  },
+  {
+    "service_id": "hvac_furnace_replacement",
+    "category": "hvac",
+    "name": "Furnace replacement",
+    "common_name": "new furnace",
+    "pricing_model": "flat",
+    "unit": "system",
+    "market_price_low_usd": 4500,
+    "market_price_high_usd": 9500,
+    "typical_duration": "1 day",
+    "permit_typically_required": true,
+    "aliases": [
+      "new furnace"
+    ],
+    "common_problems": [
+      "the furnace had a cracked heat exchanger",
+      "our 25-year-old furnace was done"
+    ],
+    "typical_work": [
+      "installed a new furnace and replaced the flue"
+    ],
+    "peak_months": [
+      1,
+      2,
+      12
+    ]
+  },
+  {
+    "service_id": "hvac_ductwork",
+    "category": "hvac",
+    "name": "Ductwork replacement or repair",
+    "common_name": "ductwork replacement",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 3500,
+    "market_price_high_usd": 9500,
+    "typical_duration": "1-3 days",
+    "permit_typically_required": false,
+    "aliases": [
+      "ducts",
+      "ductwork",
+      "hot rooms"
+    ],
+    "common_problems": [
+      "some rooms were 10 degrees hotter than others",
+      "the attic ducts were crushed and leaking"
+    ],
+    "typical_work": [
+      "replaced the attic ductwork and balanced the airflow"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "hvac_duct_cleaning",
+    "category": "hvac",
+    "name": "Duct cleaning",
+    "common_name": "duct cleaning",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 350,
+    "market_price_high_usd": 850,
+    "typical_duration": "half day",
+    "permit_typically_required": false,
+    "aliases": [
+      "duct cleaning"
+    ],
+    "common_problems": [
+      "the house was dusty no matter what we did",
+      "we moved into a house with pets"
+    ],
+    "typical_work": [
+      "cleaned every duct and showed us before and after photos"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "hvac_mini_split",
+    "category": "hvac",
+    "name": "Ductless mini-split installation",
+    "common_name": "mini split",
+    "pricing_model": "per_zone",
+    "unit": "zone",
+    "market_price_low_usd": 3200,
+    "market_price_high_usd": 6800,
+    "typical_duration": "1-2 days",
+    "permit_typically_required": true,
+    "aliases": [
+      "mini split",
+      "ductless"
+    ],
+    "common_problems": [
+      "our garage office was unbearable in summer",
+      "the converted attic had no AC"
+    ],
+    "typical_work": [
+      "installed a mini-split head and hid the line set neatly"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "hvac_thermostat",
+    "category": "hvac",
+    "name": "Smart thermostat installation",
+    "common_name": "thermostat install",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 175,
+    "market_price_high_usd": 450,
+    "typical_duration": "1 hour",
+    "permit_typically_required": false,
+    "aliases": [
+      "thermostat",
+      "smart thermostat"
+    ],
+    "common_problems": [
+      "we wanted a smart thermostat",
+      "the old thermostat stopped responding"
+    ],
+    "typical_work": [
+      "installed the new thermostat and ran a C-wire"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "hvac_air_quality",
+    "category": "hvac",
+    "name": "Indoor air quality (filtration, UV, dehumidifier)",
+    "common_name": "air quality upgrade",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 600,
+    "market_price_high_usd": 2800,
+    "typical_duration": "half day",
+    "permit_typically_required": false,
+    "aliases": [
+      "air purifier",
+      "UV light",
+      "dehumidifier",
+      "air quality"
+    ],
+    "common_problems": [
+      "allergies were brutal in cedar season",
+      "the house felt humid and musty"
+    ],
+    "typical_work": [
+      "installed a media filter cabinet and a whole-house dehumidifier"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "hvac_maintenance_plan",
+    "category": "hvac",
+    "name": "Annual maintenance plan",
+    "common_name": "maintenance plan",
+    "pricing_model": "per_year",
+    "unit": "year",
+    "market_price_low_usd": 150,
+    "market_price_high_usd": 320,
+    "typical_duration": "2 visits per year",
+    "permit_typically_required": false,
+    "aliases": [
+      "maintenance plan",
+      "service agreement",
+      "membership"
+    ],
+    "common_problems": [
+      "we wanted someone to check the system every spring and fall"
+    ],
+    "typical_work": [
+      "signed us up for twice-yearly visits with priority scheduling"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "roof_inspection",
+    "category": "roofing",
+    "name": "Roof inspection",
+    "common_name": "roof inspection",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 0,
+    "market_price_high_usd": 275,
+    "typical_duration": "1 hour",
+    "permit_typically_required": false,
+    "aliases": [
+      "roof inspection",
+      "free inspection"
+    ],
+    "common_problems": [
+      "we were buying a house and wanted the roof checked",
+      "we weren't sure if the hail did any damage"
+    ],
+    "typical_work": [
+      "went up on the roof and sent a photo report"
+    ],
+    "peak_months": [
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "service_id": "roof_repair",
+    "category": "roofing",
+    "name": "Roof leak repair",
+    "common_name": "roof leak repair",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 350,
+    "market_price_high_usd": 1800,
+    "typical_duration": "half day",
+    "permit_typically_required": false,
+    "aliases": [
+      "roof leak",
+      "leak repair"
+    ],
+    "common_problems": [
+      "water was dripping from the ceiling during a storm",
+      "there was a stain spreading on the bedroom ceiling"
+    ],
+    "typical_work": [
+      "replaced the cracked pipe boot and resealed the flashing",
+      "fixed the valley that was leaking"
+    ],
+    "peak_months": [
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "service_id": "roof_shingle_replacement",
+    "category": "roofing",
+    "name": "Asphalt shingle roof replacement",
+    "common_name": "new roof",
+    "pricing_model": "per_square",
+    "unit": "square (100 sq ft)",
+    "market_price_low_usd": 475,
+    "market_price_high_usd": 800,
+    "typical_duration": "1-2 days",
+    "permit_typically_required": true,
+    "aliases": [
+      "new roof",
+      "reroof",
+      "roof replacement",
+      "shingles"
+    ],
+    "common_problems": [
+      "hail destroyed our roof",
+      "our roof was 22 years old and losing granules",
+      "insurance approved a full replacement"
+    ],
+    "typical_work": [
+      "tore off and replaced the whole roof in one day with impact-resistant shingles",
+      "replaced the roof and cleaned up every nail"
+    ],
+    "peak_months": [
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "service_id": "roof_metal",
+    "category": "roofing",
+    "name": "Metal roof installation",
+    "common_name": "metal roof",
+    "pricing_model": "per_square",
+    "unit": "square (100 sq ft)",
+    "market_price_low_usd": 950,
+    "market_price_high_usd": 1700,
+    "typical_duration": "3-5 days",
+    "permit_typically_required": true,
+    "aliases": [
+      "metal roof",
+      "standing seam"
+    ],
+    "common_problems": [
+      "we wanted a metal roof that would survive hail",
+      "we wanted a standing seam roof for the farmhouse look"
+    ],
+    "typical_work": [
+      "installed a standing seam metal roof with snow guards and new flashing"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "roof_tile",
+    "category": "roofing",
+    "name": "Tile roof repair or replacement",
+    "common_name": "tile roof repair",
+    "pricing_model": "per_square",
+    "unit": "square (100 sq ft)",
+    "market_price_low_usd": 1000,
+    "market_price_high_usd": 1900,
+    "typical_duration": "3-6 days",
+    "permit_typically_required": true,
+    "aliases": [
+      "tile roof",
+      "clay tile"
+    ],
+    "common_problems": [
+      "several clay tiles cracked in the storm",
+      "the underlayment under our tile roof failed"
+    ],
+    "typical_work": [
+      "replaced the underlayment and reset the tiles"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "roof_flat",
+    "category": "roofing",
+    "name": "Flat roof (TPO) installation",
+    "common_name": "flat roof",
+    "pricing_model": "per_square",
+    "unit": "square (100 sq ft)",
+    "market_price_low_usd": 650,
+    "market_price_high_usd": 1150,
+    "typical_duration": "1-3 days",
+    "permit_typically_required": true,
+    "aliases": [
+      "flat roof",
+      "TPO",
+      "modified bitumen"
+    ],
+    "common_problems": [
+      "our modern house has a flat roof that kept ponding",
+      "the patio's flat roof was leaking"
+    ],
+    "typical_work": [
+      "installed a new TPO membrane with tapered insulation for drainage"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "roof_storm_claim",
+    "category": "roofing",
+    "name": "Storm damage inspection and insurance claim help",
+    "common_name": "hail damage claim",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 0,
+    "market_price_high_usd": 350,
+    "typical_duration": "1-2 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "hail damage",
+      "insurance claim",
+      "storm damage"
+    ],
+    "common_problems": [
+      "a hailstorm went through the neighborhood",
+      "the neighbors were all getting new roofs after the storm"
+    ],
+    "typical_work": [
+      "documented the hail damage and met with the insurance adjuster"
+    ],
+    "peak_months": [
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "service_id": "roof_emergency_tarp",
+    "category": "roofing",
+    "name": "Emergency roof tarping",
+    "common_name": "emergency tarp",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 350,
+    "market_price_high_usd": 950,
+    "typical_duration": "1-2 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "tarp",
+      "emergency roofer"
+    ],
+    "common_problems": [
+      "a tree limb punched a hole in the roof",
+      "the storm ripped shingles off and it was still raining"
+    ],
+    "typical_work": [
+      "tarped the roof that night"
+    ],
+    "peak_months": [
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "service_id": "roof_gutter_install",
+    "category": "roofing",
+    "name": "Gutter installation",
+    "common_name": "new gutters",
+    "pricing_model": "per_linear_ft",
+    "unit": "linear ft",
+    "market_price_low_usd": 9,
+    "market_price_high_usd": 24,
+    "typical_duration": "1 day",
+    "permit_typically_required": false,
+    "aliases": [
+      "gutters",
+      "seamless gutters",
+      "downspouts"
+    ],
+    "common_problems": [
+      "water was pouring off the roof and eroding the beds",
+      "our house had no gutters"
+    ],
+    "typical_work": [
+      "installed 6-inch seamless gutters with oversized downspouts"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "roof_gutter_cleaning",
+    "category": "roofing",
+    "name": "Gutter cleaning",
+    "common_name": "gutter cleaning",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 150,
+    "market_price_high_usd": 375,
+    "typical_duration": "1-2 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "gutter cleaning"
+    ],
+    "common_problems": [
+      "the gutters were full of oak leaves",
+      "the gutters overflowed every time it rained"
+    ],
+    "typical_work": [
+      "cleaned the gutters and flushed the downspouts"
+    ],
+    "peak_months": [
+      11
+    ]
+  },
+  {
+    "service_id": "roof_skylight",
+    "category": "roofing",
+    "name": "Skylight installation or repair",
+    "common_name": "skylight repair",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 900,
+    "market_price_high_usd": 3200,
+    "typical_duration": "1 day",
+    "permit_typically_required": false,
+    "aliases": [
+      "skylight"
+    ],
+    "common_problems": [
+      "our skylight leaked every time it rained",
+      "we wanted more light in the kitchen"
+    ],
+    "typical_work": [
+      "replaced the skylight and reflashed it properly"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "roof_ventilation",
+    "category": "roofing",
+    "name": "Attic ventilation",
+    "common_name": "attic ventilation",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 450,
+    "market_price_high_usd": 1800,
+    "typical_duration": "half day",
+    "permit_typically_required": false,
+    "aliases": [
+      "ridge vent",
+      "attic fan",
+      "ventilation"
+    ],
+    "common_problems": [
+      "the attic was 150 degrees in summer",
+      "the upstairs was always hot"
+    ],
+    "typical_work": [
+      "added ridge vents and fixed the soffit intake"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "land_lawn_maintenance",
+    "category": "landscaping",
+    "name": "Lawn mowing and maintenance",
+    "common_name": "lawn care",
+    "pricing_model": "per_visit",
+    "unit": "visit",
+    "market_price_low_usd": 45,
+    "market_price_high_usd": 95,
+    "typical_duration": "1 hour",
+    "permit_typically_required": false,
+    "aliases": [
+      "mowing",
+      "lawn care",
+      "yard service"
+    ],
+    "common_problems": [
+      "we needed someone to keep up with the lawn",
+      "the HOA sent us a letter about the yard"
+    ],
+    "typical_work": [
+      "mowed, edged and blew every week like clockwork"
+    ],
+    "peak_months": [
+      5
+    ]
+  },
+  {
+    "service_id": "land_design",
+    "category": "landscaping",
+    "name": "Landscape design",
+    "common_name": "landscape design",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 450,
+    "market_price_high_usd": 3500,
+    "typical_duration": "2-4 weeks",
+    "permit_typically_required": false,
+    "aliases": [
+      "landscape design",
+      "landscape plan"
+    ],
+    "common_problems": [
+      "we had a blank yard and no idea where to start",
+      "we wanted a plan before spending money"
+    ],
+    "typical_work": [
+      "drew up a full plan with native plants and a phased budget"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "land_front_yard",
+    "category": "landscaping",
+    "name": "Front yard makeover",
+    "common_name": "front yard redo",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 6000,
+    "market_price_high_usd": 28000,
+    "typical_duration": "1-3 weeks",
+    "permit_typically_required": false,
+    "aliases": [
+      "front yard",
+      "curb appeal"
+    ],
+    "common_problems": [
+      "our front yard was mostly dead grass",
+      "we wanted more curb appeal before selling"
+    ],
+    "typical_work": [
+      "replaced the front lawn with native beds, limestone borders and a new walkway",
+      "redid the front beds, added a dry creek bed and path lighting"
+    ],
+    "peak_months": [
+      3,
+      4,
+      10
+    ]
+  },
+  {
+    "service_id": "land_backyard",
+    "category": "landscaping",
+    "name": "Backyard makeover",
+    "common_name": "backyard remodel",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 12000,
+    "market_price_high_usd": 65000,
+    "typical_duration": "2-6 weeks",
+    "permit_typically_required": false,
+    "aliases": [
+      "backyard",
+      "outdoor living",
+      "backyard remodel"
+    ],
+    "common_problems": [
+      "we wanted to actually use our backyard",
+      "the backyard was a mud pit every time it rained"
+    ],
+    "typical_work": [
+      "built a flagstone patio, a fire pit area and new planting beds",
+      "regraded the yard, built a pergola and planted shade trees"
+    ],
+    "peak_months": [
+      3,
+      4,
+      10
+    ]
+  },
+  {
+    "service_id": "land_sod",
+    "category": "landscaping",
+    "name": "Sod installation",
+    "common_name": "new sod",
+    "pricing_model": "per_sqft",
+    "unit": "sq ft",
+    "market_price_low_usd": 1.6,
+    "market_price_high_usd": 3.8,
+    "typical_duration": "1-2 days",
+    "permit_typically_required": false,
+    "aliases": [
+      "sod",
+      "new grass",
+      "St. Augustine",
+      "Zoysia",
+      "Bermuda"
+    ],
+    "common_problems": [
+      "the lawn died during the drought",
+      "we needed new grass before the house went on the market"
+    ],
+    "typical_work": [
+      "tilled the soil and laid Zoysia sod"
+    ],
+    "peak_months": [
+      3,
+      4,
+      10
+    ]
+  },
+  {
+    "service_id": "land_xeriscape",
+    "category": "landscaping",
+    "name": "Xeriscaping and native plants",
+    "common_name": "xeriscaping",
+    "pricing_model": "per_sqft",
+    "unit": "sq ft",
+    "market_price_low_usd": 9,
+    "market_price_high_usd": 26,
+    "typical_duration": "1-2 weeks",
+    "permit_typically_required": false,
+    "aliases": [
+      "xeriscape",
+      "drought tolerant",
+      "native plants"
+    ],
+    "common_problems": [
+      "we were tired of watering grass in 100 degree heat",
+      "we wanted a drought-tolerant yard"
+    ],
+    "typical_work": [
+      "converted the lawn to native plants, decomposed granite and river rock"
+    ],
+    "peak_months": [
+      3,
+      4,
+      10
+    ]
+  },
+  {
+    "service_id": "land_irrigation_install",
+    "category": "landscaping",
+    "name": "Irrigation system installation",
+    "common_name": "sprinkler system",
+    "pricing_model": "per_zone",
+    "unit": "zone",
+    "market_price_low_usd": 650,
+    "market_price_high_usd": 1250,
+    "typical_duration": "1-2 days",
+    "permit_typically_required": true,
+    "aliases": [
+      "sprinkler system",
+      "irrigation",
+      "drip irrigation"
+    ],
+    "common_problems": [
+      "we wanted a sprinkler system",
+      "the yard needed drip irrigation for the new beds"
+    ],
+    "typical_work": [
+      "installed a new irrigation system with a smart controller and backflow preventer"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "land_irrigation_repair",
+    "category": "landscaping",
+    "name": "Sprinkler and irrigation repair",
+    "common_name": "sprinkler repair",
+    "pricing_model": "hourly",
+    "unit": "hour",
+    "market_price_low_usd": 80,
+    "market_price_high_usd": 135,
+    "typical_duration": "1-3 hours",
+    "permit_typically_required": false,
+    "aliases": [
+      "sprinkler repair",
+      "irrigation repair"
+    ],
+    "common_problems": [
+      "a sprinkler head was geysering",
+      "one zone stopped working"
+    ],
+    "typical_work": [
+      "fixed the broken heads and replaced a bad valve"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "land_tree_trimming",
+    "category": "landscaping",
+    "name": "Tree trimming",
+    "common_name": "tree trimming",
+    "pricing_model": "per_tree",
+    "unit": "tree",
+    "market_price_low_usd": 275,
+    "market_price_high_usd": 1200,
+    "typical_duration": "half day",
+    "permit_typically_required": false,
+    "aliases": [
+      "tree trimming",
+      "pruning",
+      "tree service"
+    ],
+    "common_problems": [
+      "the live oaks were hanging over the roof",
+      "branches were rubbing the house"
+    ],
+    "typical_work": [
+      "trimmed the oaks and painted the cuts to prevent oak wilt"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "land_tree_removal",
+    "category": "landscaping",
+    "name": "Tree removal",
+    "common_name": "tree removal",
+    "pricing_model": "per_tree",
+    "unit": "tree",
+    "market_price_low_usd": 650,
+    "market_price_high_usd": 3800,
+    "typical_duration": "1 day",
+    "permit_typically_required": false,
+    "aliases": [
+      "tree removal",
+      "stump grinding"
+    ],
+    "common_problems": [
+      "a dead tree was leaning toward the house",
+      "the freeze killed a big tree in the backyard"
+    ],
+    "typical_work": [
+      "took the tree down in sections and ground the stump"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "land_hardscape",
+    "category": "landscaping",
+    "name": "Patio and paver hardscaping",
+    "common_name": "paver patio",
+    "pricing_model": "per_sqft",
+    "unit": "sq ft",
+    "market_price_low_usd": 16,
+    "market_price_high_usd": 38,
+    "typical_duration": "1-2 weeks",
+    "permit_typically_required": false,
+    "aliases": [
+      "patio",
+      "pavers",
+      "flagstone",
+      "hardscape"
+    ],
+    "common_problems": [
+      "we wanted a patio for the backyard",
+      "the old concrete patio was cracked"
+    ],
+    "typical_work": [
+      "built a paver patio with a seat wall"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "land_retaining_wall",
+    "category": "landscaping",
+    "name": "Retaining wall",
+    "common_name": "retaining wall",
+    "pricing_model": "per_sqft",
+    "unit": "sq ft of wall face",
+    "market_price_low_usd": 45,
+    "market_price_high_usd": 110,
+    "typical_duration": "1-2 weeks",
+    "permit_typically_required": false,
+    "aliases": [
+      "retaining wall",
+      "limestone wall"
+    ],
+    "common_problems": [
+      "the slope in the backyard kept washing out",
+      "we needed to terrace the hillside"
+    ],
+    "typical_work": [
+      "built a limestone block retaining wall with drainage behind it"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "land_drainage",
+    "category": "landscaping",
+    "name": "Yard drainage (French drains)",
+    "common_name": "French drain",
+    "pricing_model": "per_linear_ft",
+    "unit": "linear ft",
+    "market_price_low_usd": 30,
+    "market_price_high_usd": 85,
+    "typical_duration": "2-4 days",
+    "permit_typically_required": false,
+    "aliases": [
+      "French drain",
+      "drainage",
+      "standing water"
+    ],
+    "common_problems": [
+      "water pooled against the foundation every storm",
+      "the backyard flooded every time it rained"
+    ],
+    "typical_work": [
+      "installed a French drain and regraded the side yard"
+    ],
+    "peak_months": []
+  },
+  {
+    "service_id": "land_cleanup",
+    "category": "landscaping",
+    "name": "Seasonal cleanup",
+    "common_name": "yard cleanup",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 250,
+    "market_price_high_usd": 900,
+    "typical_duration": "half day",
+    "permit_typically_required": false,
+    "aliases": [
+      "yard cleanup",
+      "leaf removal"
+    ],
+    "common_problems": [
+      "the yard was overgrown after a long summer",
+      "we needed the leaves and dead plants cleared"
+    ],
+    "typical_work": [
+      "cleared the beds, cut back the perennials and hauled everything off"
+    ],
+    "peak_months": [
+      2,
+      3
+    ]
+  },
+  {
+    "service_id": "land_mulch_beds",
+    "category": "landscaping",
+    "name": "Mulch and bed installation",
+    "common_name": "flower beds",
+    "pricing_model": "flat",
+    "unit": "job",
+    "market_price_low_usd": 350,
+    "market_price_high_usd": 1800,
+    "typical_duration": "1 day",
+    "permit_typically_required": false,
+    "aliases": [
+      "mulch",
+      "flower beds",
+      "planting"
+    ],
+    "common_problems": [
+      "the flower beds looked tired",
+      "we wanted fresh beds along the front of the house"
+    ],
+    "typical_work": [
+      "edged the beds, added new plants and laid fresh mulch"
+    ],
+    "peak_months": []
+  }
+]

@@ -1,0 +1,312 @@
+[
+  {
+    "city": "Austin",
+    "county": "Travis",
+    "state": "TX",
+    "neighborhoods": [
+      {
+        "name": "Hyde Park",
+        "zip": "78751",
+        "typical_home_years": [
+          1920,
+          1955
+        ]
+      },
+      {
+        "name": "Travis Heights",
+        "zip": "78704",
+        "typical_home_years": [
+          1925,
+          1965
+        ]
+      },
+      {
+        "name": "Zilker",
+        "zip": "78704",
+        "typical_home_years": [
+          1940,
+          2015
+        ]
+      },
+      {
+        "name": "Barton Hills",
+        "zip": "78704",
+        "typical_home_years": [
+          1960,
+          1985
+        ]
+      },
+      {
+        "name": "Allandale",
+        "zip": "78757",
+        "typical_home_years": [
+          1950,
+          1970
+        ]
+      },
+      {
+        "name": "Crestview",
+        "zip": "78757",
+        "typical_home_years": [
+          1950,
+          1965
+        ]
+      },
+      {
+        "name": "Tarrytown",
+        "zip": "78703",
+        "typical_home_years": [
+          1935,
+          1975
+        ]
+      },
+      {
+        "name": "Mueller",
+        "zip": "78723",
+        "typical_home_years": [
+          2008,
+          2022
+        ]
+      },
+      {
+        "name": "Windsor Park",
+        "zip": "78723",
+        "typical_home_years": [
+          1950,
+          1970
+        ]
+      },
+      {
+        "name": "East Cesar Chavez",
+        "zip": "78702",
+        "typical_home_years": [
+          1925,
+          2020
+        ]
+      },
+      {
+        "name": "Circle C Ranch",
+        "zip": "78739",
+        "typical_home_years": [
+          1990,
+          2010
+        ]
+      },
+      {
+        "name": "North Loop",
+        "zip": "78751",
+        "typical_home_years": [
+          1935,
+          1960
+        ]
+      },
+      {
+        "name": "Avery Ranch",
+        "zip": "78717",
+        "typical_home_years": [
+          2000,
+          2015
+        ]
+      },
+      {
+        "name": "Southpark Meadows",
+        "zip": "78748",
+        "typical_home_years": [
+          1995,
+          2015
+        ]
+      }
+    ]
+  },
+  {
+    "city": "Round Rock",
+    "county": "Williamson",
+    "state": "TX",
+    "neighborhoods": [
+      {
+        "name": "Brushy Creek",
+        "zip": "78681",
+        "typical_home_years": [
+          1985,
+          2005
+        ]
+      },
+      {
+        "name": "Teravista",
+        "zip": "78665",
+        "typical_home_years": [
+          2004,
+          2020
+        ]
+      },
+      {
+        "name": "Forest Creek",
+        "zip": "78664",
+        "typical_home_years": [
+          1990,
+          2005
+        ]
+      }
+    ]
+  },
+  {
+    "city": "Cedar Park",
+    "county": "Williamson",
+    "state": "TX",
+    "neighborhoods": [
+      {
+        "name": "Buttercup Creek",
+        "zip": "78613",
+        "typical_home_years": [
+          1985,
+          2000
+        ]
+      },
+      {
+        "name": "Twin Creeks",
+        "zip": "78613",
+        "typical_home_years": [
+          2000,
+          2015
+        ]
+      }
+    ]
+  },
+  {
+    "city": "Pflugerville",
+    "county": "Travis",
+    "state": "TX",
+    "neighborhoods": [
+      {
+        "name": "Falcon Pointe",
+        "zip": "78660",
+        "typical_home_years": [
+          2005,
+          2018
+        ]
+      },
+      {
+        "name": "Blackhawk",
+        "zip": "78660",
+        "typical_home_years": [
+          2000,
+          2012
+        ]
+      }
+    ]
+  },
+  {
+    "city": "Georgetown",
+    "county": "Williamson",
+    "state": "TX",
+    "neighborhoods": [
+      {
+        "name": "Sun City",
+        "zip": "78633",
+        "typical_home_years": [
+          1996,
+          2020
+        ]
+      },
+      {
+        "name": "Wolf Ranch",
+        "zip": "78628",
+        "typical_home_years": [
+          2010,
+          2022
+        ]
+      },
+      {
+        "name": "Old Town",
+        "zip": "78626",
+        "typical_home_years": [
+          1900,
+          1960
+        ]
+      }
+    ]
+  },
+  {
+    "city": "Leander",
+    "county": "Williamson",
+    "state": "TX",
+    "neighborhoods": [
+      {
+        "name": "Crystal Falls",
+        "zip": "78641",
+        "typical_home_years": [
+          2000,
+          2018
+        ]
+      },
+      {
+        "name": "Travisso",
+        "zip": "78641",
+        "typical_home_years": [
+          2015,
+          2024
+        ]
+      }
+    ]
+  },
+  {
+    "city": "Kyle",
+    "county": "Hays",
+    "state": "TX",
+    "neighborhoods": [
+      {
+        "name": "Plum Creek",
+        "zip": "78640",
+        "typical_home_years": [
+          2002,
+          2020
+        ]
+      }
+    ]
+  },
+  {
+    "city": "Buda",
+    "county": "Hays",
+    "state": "TX",
+    "neighborhoods": [
+      {
+        "name": "Sunfield",
+        "zip": "78610",
+        "typical_home_years": [
+          2008,
+          2022
+        ]
+      }
+    ]
+  },
+  {
+    "city": "Lakeway",
+    "county": "Travis",
+    "state": "TX",
+    "neighborhoods": [
+      {
+        "name": "Rough Hollow",
+        "zip": "78734",
+        "typical_home_years": [
+          2005,
+          2022
+        ]
+      }
+    ]
+  },
+  {
+    "city": "Dripping Springs",
+    "county": "Hays",
+    "state": "TX",
+    "neighborhoods": [
+      {
+        "name": "Belterra",
+        "zip": "78737",
+        "typical_home_years": [
+          2003,
+          2020
+        ]
+      }
+    ]
+  }
+]

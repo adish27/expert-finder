@@ -1,0 +1,82 @@
+[
+  {
+    "category_id": "plumbing",
+    "name": "Plumbing",
+    "trade_noun": "plumber",
+    "license_authority": "Texas State Board of Plumbing Examiners (TSBPE)",
+    "license_required": true,
+    "in_dataset": true
+  },
+  {
+    "category_id": "electrical",
+    "name": "Electrical",
+    "trade_noun": "electrician",
+    "license_authority": "Texas Department of Licensing and Regulation (TDLR)",
+    "license_required": true,
+    "in_dataset": true
+  },
+  {
+    "category_id": "hvac",
+    "name": "HVAC (Heating & Air Conditioning)",
+    "trade_noun": "HVAC tech",
+    "license_authority": "Texas Department of Licensing and Regulation (TDLR)",
+    "license_required": true,
+    "in_dataset": true
+  },
+  {
+    "category_id": "roofing",
+    "name": "Roofing & Gutters",
+    "trade_noun": "roofer",
+    "license_authority": null,
+    "license_required": false,
+    "in_dataset": true
+  },
+  {
+    "category_id": "landscaping",
+    "name": "Landscaping (front yard, backyard, irrigation, trees)",
+    "trade_noun": "landscaper",
+    "license_authority": "Texas Commission on Environmental Quality (TCEQ) for irrigation",
+    "license_required": false,
+    "in_dataset": true
+  },
+  {
+    "category_id": "general_contractor",
+    "name": "General Contractor",
+    "trade_noun": "general contractor",
+    "license_authority": null,
+    "license_required": false,
+    "in_dataset": false
+  },
+  {
+    "category_id": "kitchen_remodel",
+    "name": "Kitchen Remodeling",
+    "trade_noun": "remodeler",
+    "license_authority": null,
+    "license_required": false,
+    "in_dataset": false
+  },
+  {
+    "category_id": "bathroom_remodel",
+    "name": "Bathroom Remodeling",
+    "trade_noun": "remodeler",
+    "license_authority": null,
+    "license_required": false,
+    "in_dataset": false
+  },
+  {
+    "category_id": "painting",
+    "name": "Painting",
+    "trade_noun": "painter",
+    "license_authority": null,
+    "license_required": false,
+    "in_dataset": false
+  },
+  {
+    "category_id": "handyman",
+    "name": "Handyman",
+    "trade_noun": "handyman",
+    "license_authority": null,
+    "license_required": false,
+    "in_dataset": false
+  }
+]

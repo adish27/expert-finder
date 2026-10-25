@@ -1,0 +1,110 @@
+{
+  "review_platforms": [
+    {
+      "platform": "google",
+      "name": "Google Business Profile",
+      "rating_scale": 5,
+      "has_title": false,
+      "has_cost_field": false,
+      "has_sub_ratings": false,
+      "verified_hire": false,
+      "owner_responses": true
+    },
+    {
+      "platform": "yelp",
+      "name": "Yelp",
+      "rating_scale": 5,
+      "has_title": false,
+      "has_cost_field": false,
+      "has_sub_ratings": false,
+      "verified_hire": false,
+      "owner_responses": true
+    },
+    {
+      "platform": "angi",
+      "name": "Angi",
+      "rating_scale": 5,
+      "has_title": true,
+      "has_cost_field": true,
+      "has_sub_ratings": true,
+      "verified_hire": true,
+      "owner_responses": true,
+      "sub_rating_keys": [
+        "quality",
+        "value",
+        "punctuality",
+        "professionalism",
+        "responsiveness"
+      ]
+    },
+    {
+      "platform": "thumbtack",
+      "name": "Thumbtack",
+      "rating_scale": 5,
+      "has_title": false,
+      "has_cost_field": true,
+      "has_sub_ratings": false,
+      "verified_hire": true,
+      "owner_responses": true
+    },
+    {
+      "platform": "bbb",
+      "name": "Better Business Bureau",
+      "rating_scale": 5,
+      "has_title": false,
+      "has_cost_field": false,
+      "has_sub_ratings": false,
+      "verified_hire": false,
+      "owner_responses": true,
+      "notes": "Includes formal complaints with a resolution status as well as customer reviews."
+    },
+    {
+      "platform": "houzz",
+      "name": "Houzz",
+      "rating_scale": 5,
+      "has_title": true,
+      "has_cost_field": true,
+      "has_sub_ratings": false,
+      "verified_hire": false,
+      "owner_responses": true,
+      "notes": "Skews toward design-heavy projects: landscaping, roofing, outdoor lighting."
+    }
+  ],
+  "social_platforms": [
+    {
+      "platform": "nextdoor",
+      "name": "Nextdoor",
+      "content": "Neighborhood recommendation threads and warnings.",
+      "has_threads": true,
+      "has_video": false
+    },
+    {
+      "platform": "facebook",
+      "name": "Facebook Groups",
+      "content": "Local community and homeowner groups; recommendations, price checks, complaints.",
+      "has_threads": true,
+      "has_video": false
+    },
+    {
+      "platform": "reddit",
+      "name": "Reddit",
+      "content": "City subreddits; recommendation threads and PSAs.",
+      "has_threads": true,
+      "has_video": false
+    },
+    {
+      "platform": "tiktok",
+      "name": "TikTok",
+      "content": "Short videos: business showcases, homeowner storytimes, price reveals.",
+      "has_threads": false,
+      "has_video": true
+    },
+    {
+      "platform": "instagram",
+      "name": "Instagram",
+      "content": "Before/after project photos from businesses and customers.",
+      "has_threads": false,
+      "has_video": true
+    }
+  ]
+}

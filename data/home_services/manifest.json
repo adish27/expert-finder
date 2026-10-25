@@ -1,0 +1,79 @@
+{
+  "name": "home_services_synthetic",
+  "version": "1.0.0",
+  "generated_on": "2026-10-25",
+  "seed": 20261025,
+  "synthetic": true,
+  "disclaimer": "All businesses, people, reviews and posts are fictional and generated. Cities, neighborhoods, platform names, product brands and licensing bodies are real and used only for realism. License numbers contain 'SYN', phone numbers use the reserved 555-01xx range and websites use the reserved .example domain.",
+  "timezone": "America/Chicago",
+  "currency": "USD",
+  "region": "Austin, TX metro",
+  "date_range": [
+    "2021-01-01",
+    "2026-10-25"
+  ],
+  "files": {
+    "businesses.jsonl": 100,
+    "experts.jsonl": 325,
+    "service_offerings.jsonl": 999,
+    "customers.jsonl": 1400,
+    "estimates.jsonl": 1258,
+    "reviews.jsonl": 2041,
+    "social_posts.jsonl": 884,
+    "ground_truth/social_mentions.jsonl": 716,
+    "ground_truth/review_flags.jsonl": 231
+  },
+  "summary": {
+    "businesses_per_category": {
+      "plumbing": 20,
+      "electrical": 20,
+      "hvac": 20,
+      "roofing": 20,
+      "landscaping": 20
+    },
+    "services_in_catalog": 66,
+    "reviews_per_platform": {
+      "bbb": 116,
+      "angi": 266,
+      "yelp": 392,
+      "google": 909,
+      "houzz": 125,
+      "thumbtack": 233
+    },
+    "rating_distribution": {
+      "1": 163,
+      "2": 192,
+      "3": 205,
+      "4": 301,
+      "5": 1120
+    },
+    "mean_rating": 4.02,
+    "bbb_complaints": 60,
+    "estimates_by_status": {
+      "accepted": 651,
+      "declined": 508,
+      "expired": 96,
+      "pending": 3
+    },
+    "posts_per_platform": {
+      "nextdoor": 311,
+      "facebook": 244,
+      "reddit": 87,
+      "tiktok": 114,
+      "instagram": 128
+    },
+    "post_types": {
+      "recommendation_request": 119,
+      "reply_warning": 83,
+      "reply_recommendation": 292,
+      "reply_other": 49,
+      "price_check": 30,
+      "reply_price_comparison": 59,
+      "warning": 10,
+      "project_showcase": 172,
+      "homeowner_recommendation": 33,
+      "price_reveal": 20,
+      "storytime_complaint": 17
+    }
+  }
+}
