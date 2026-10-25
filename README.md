@@ -1,32 +1,38 @@
 # Home Services Expert Finder
 
 Helps homeowners find the right plumber, electrician, HVAC tech, roofer or landscaper, at a fair
-price, backed by evidence from reviews and neighbors. Planned as a Graph RAG application with
-Chroma for vector search, Neo4j for relationships, and LangChain 1.x + OpenAI for agents and answers.
+price, backed by evidence from reviews and neighbors. A conversational agent (LangChain + LangGraph,
+OpenAI) over Pinecone (semantic search) and Neo4j (relationships), traced in LangSmith. It compares
+vector RAG against graph RAG on the same questions. See [docs/application_overview.md](docs/application_overview.md).
 
-**Status:** phase 1 (synthetic dataset) is done. The retrieval and agent layers are next.
+**Status:** dataset done; semantic index built in Pinecone. The structured store, graph, agent and evaluation are next.
 
 ## Layout
 
 ```
-data/home_services/        synthetic dataset (JSONL + reference JSON); see its README for the plan and data dictionary
-scripts/
-  home_services_catalog.py        domain knowledge: services, market prices, geography, platforms
-  generate_home_services_data.py  deterministic generator + validation
+data/home_services/        synthetic dataset (JSONL + reference JSON); see its README for the data dictionary
+docs/                      application overview
+scripts/                   dataset catalog + deterministic generator
 src/expert_finder/
-  config.py         settings from env / .env (models, Neo4j, storage, dataset path)
-  embeddings.py     OpenAI text-embedding-3-small, or an offline hashing fallback
-  tool_loadout.py   LangChain middleware that binds only the top-k relevant tools per question
-tests/test_dataset.py   dataset integrity checks
-docker-compose.yml      local Neo4j
+  config.py          settings from .env (OpenAI, Pinecone, Neo4j, LangSmith)
+  dataset.py         loads the raw dataset (never ground_truth/)
+  documents.py       records -> documents with metadata (reviews, social posts, business profiles)
+  vector_store.py    Pinecone index "home-services", one namespace per corpus
+  graph_db.py        Neo4j driver (works around missing CA certs on python.org macOS builds)
+  embeddings.py      OpenAI text-embedding-3-small
+  tool_loadout.py    LangChain middleware that binds only the top-k relevant tools per question
+  cli.py             `expert-finder` command
+tests/
 ```
 
 ## Setup
 
 ```bash
 uv sync
-cp .env.example .env                 # add OPENAI_API_KEY
-docker compose up -d neo4j           # optional until the graph layer lands
-uv run python scripts/generate_home_services_data.py   # regenerate the dataset (deterministic)
+cp .env.example .env                 # fill in keys
+uv run expert-finder check           # verify OpenAI, Pinecone, Neo4j, LangSmith
+uv run expert-finder index           # embed and upsert into Pinecone (~3K docs, < $0.01)
+uv run expert-finder search "bill was higher than the quote" --namespace reviews \
+    --filter '{"category": "hvac", "rating": {"$lte": 2}}'
 uv run pytest
 ```
