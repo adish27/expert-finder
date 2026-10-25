@@ -11,7 +11,6 @@ Usage: uv run python scripts/generate_home_services_data.py
 from __future__ import annotations
 
 import json
-import math
 import random
 import re
 import sys
@@ -633,7 +632,7 @@ def tech_ref(job: Job) -> str | None:
     return job.expert["goes_by"] if job.expert else None
 
 
-def review_sentences(job: Job, platform: str) -> dict[str, list[str]]:
+def review_sentences(job: Job) -> dict[str, list[str]]:
     """Candidate sentences per component, conditioned on the job outcome."""
     o, b, svc = job.outcome, job.biz, job.service
     tech = tech_ref(job)
@@ -735,7 +734,7 @@ PLATFORM_SHAPE = {
 
 
 def compose_review(job: Job, platform: str) -> str:
-    s = review_sentences(job, platform)
+    s = review_sentences(job)
     order, (lo, hi) = PLATFORM_SHAPE[platform]
     o = job.outcome
     # A low rating always states what went wrong; a high one usually says what went right.
@@ -803,7 +802,7 @@ def owner_response(job: Job, rating: int, reviewer: str) -> str | None:
         return (f"{first}, I'm sorry this wasn't the experience we aim for. I'd like to make it right - please "
                 f"call me directly at the office and ask for {owner}.")
     return rng.choice([
-        f"Our records show the work was completed as quoted and signed off by the customer.",
+        "Our records show the work was completed as quoted and signed off by the customer.",
         f"{first}, we attempted to contact you several times. The additional charges were explained on site.",
         "This review does not reflect what happened. We stand by our work.",
     ])
@@ -1130,7 +1129,7 @@ def main() -> None:
             other = rng.choice(customers_by_city[city])
             add_post(platform, "reply_other", customer_author(other, platform), min(TODAY, d + timedelta(days=1)),
                      rng.choice(["Following!", "Also need one, following.",
-                                 f"Make sure they're licensed - you can look them up on the state website.",
+                                 "Make sure they're licensed - you can look them up on the state website.",
                                  "Get at least three quotes. Prices are all over the place.",
                                  "Whatever you do, don't pay the full amount upfront."]),
                      thread_id=tid, parent=root["post_id"], community=community, customer_id=other["customer_id"])

@@ -20,8 +20,6 @@ class Settings(BaseSettings):
 
     # "auto" picks OpenAI when an API key is present, otherwise a local hashing embedder.
     embeddings_provider: Literal["auto", "openai", "local"] = "auto"
-    # "auto" uses Neo4j when it is reachable, otherwise an in-memory graph (backends not built yet).
-    graph_backend: Literal["auto", "neo4j", "memory"] = "auto"
 
     neo4j_uri: str = "bolt://localhost:7687"
     neo4j_user: str = "neo4j"
@@ -45,10 +43,6 @@ class Settings(BaseSettings):
     def chroma_dir(self) -> Path:
         # Separate directories per provider: embedding dimensions differ.
         return self.storage_dir / f"chroma-{self.resolved_embeddings_provider()}"
-
-    @property
-    def graph_snapshot(self) -> Path:
-        return self.storage_dir / "graph.json"
 
 
 @lru_cache

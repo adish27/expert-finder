@@ -595,5 +595,4 @@ NAME_PATTERNS = {
                     "{first}'s Lawn Care"],
 }
 
-PAYMENT_METHODS = ["credit card", "debit card", "check", "cash", "ACH transfer", "Zelle", "Venmo", "financing"]
 LANGUAGES = ["English", "Spanish", "Vietnamese", "Mandarin", "Hindi", "Korean", "Arabic"]
