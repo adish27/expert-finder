@@ -5,7 +5,7 @@ price, backed by evidence from reviews and neighbors. A conversational agent (La
 OpenAI) over Pinecone (semantic search) and Neo4j (relationships), traced in LangSmith. It compares
 vector RAG against graph RAG on the same questions. See [docs/application_overview.md](docs/application_overview.md).
 
-**Status:** dataset, Pinecone index, SQLite store and Neo4j graph are built. The agent, comparison and evaluation are next.
+**Status:** dataset, Pinecone index, SQLite store, Neo4j graph, retrieval layer, agent and Streamlit UI are built. Evaluation against ground truth is next.
 
 ## Layout
 
@@ -22,12 +22,34 @@ src/expert_finder/
   sql_queries.py     prices, quote comparison, quote accuracy, rating trends, trust signals
   entity_resolution.py  links informal mentions ("Mike at Ace") to businesses and experts
   graph_builder.py   builds the Neo4j knowledge graph (nodes/relationships + MENTIONS links)
+  graph_queries.py   expansion from vector hits + graph-native queries
   graph_db.py        Neo4j driver (works around missing CA certs on python.org macOS builds)
+  retrieval.py       VectorRetriever and GraphRetriever -> a shared EvidenceBundle
+  app.py             container holding the three stores (connections cached, SQLite thread-local)
+  tools.py           9 agent tools (6 shared, 3 graph-only) + the tool-call recorder
+  agent.py           LangGraph agent, system prompt, and answer verification
   embeddings.py      OpenAI text-embedding-3-small
   tool_loadout.py    LangChain middleware that binds only the top-k relevant tools per question
   cli.py             `expert-finder` command
+ui/
+  Home.py            chat page with evidence and tool-trace panels
+  pages/1_Compare.py vector vs graph, side by side
+  shared.py          cached resources and rendering helpers
 tests/
 ```
+
+## How the two modes differ
+
+Both use the same model, prompt, Pinecone index and structured SQL tools. Graph mode adds:
+1. **expansion of every vector hit** through Neo4j — resolves which business a post refers to,
+   pulls in the rest of a discussion thread, attaches quote-vs-invoice to a reviewed job, and
+   surfaces businesses the vector search never returned;
+2. **three graph-only tools** — neighbourhood word of mouth, which technician people praise, and
+   review authenticity (ratings split by whether reviewers are traceable to real customers).
+
+Every answer is checked against what the tools actually returned: citations that match no
+retrieved evidence, phone numbers no tool produced, and answers with no citations at all are
+all reported as ungrounded.
 
 ## Setup
 
@@ -41,5 +63,10 @@ uv run expert-finder build-graph --reset   # build the Neo4j graph (~6.1K nodes,
 uv run expert-finder mention-report  # entity-resolution accuracy vs ground truth
 uv run expert-finder search "bill was higher than the quote" --namespace reviews \
     --filter '{"category": "hvac", "rating": {"$lte": 2}}'
-uv run pytest
+
+uv run expert-finder ask "Is Bee Cave Roofing legit?" --mode graph --evidence
+uv run streamlit run ui/Home.py     # chat UI + the vector/graph comparison page
+
+uv run pytest                       # integration tests skip without credentials
+uv run pytest -m "not integration"  # offline only
 ```
