@@ -99,8 +99,10 @@ def find_businesses(con: sqlite3.Connection, category: str | None = None, city: 
                      "WHERE kind = 'language' AND value = ?)")
         params.append(language)
     sql = f"""
-        SELECT b.business_id, b.name, b.primary_category, b.city AS based_in, b.emergency_available,
-               b.typical_reply_hours, b.typical_days_to_schedule, b.hourly_rate_usd,
+        SELECT b.business_id, b.name, b.primary_category, b.city AS based_in, b.phone,
+               b.emergency_available, b.typical_reply_hours, b.typical_days_to_schedule, b.hourly_rate_usd,
+               -- Whether the requested trade is their main line of work or a sideline.
+               (b.primary_category = coalesce(?, b.primary_category)) AS is_primary_trade,
                (SELECT group_concat(status) FROM business_licenses l WHERE l.business_id = b.business_id) AS license_status,
                round(avg(r.rating), 2) AS avg_rating, count(r.rating) AS rated_reviews,
                sum(r.review_type = 'complaint') AS complaints,
@@ -113,10 +115,11 @@ def find_businesses(con: sqlite3.Connection, category: str | None = None, city: 
         {"HAVING avg(r.rating) >= ?" if min_rating is not None else ""}
         ORDER BY avg_rating DESC, rated_reviews DESC
         LIMIT ?"""
-    params = [service_id, *params] + ([min_rating] if min_rating is not None else []) + [limit]
+    params = [category, service_id, *params] + ([min_rating] if min_rating is not None else []) + [limit]
     rows = _rows(con, sql, params)
     for r in rows:
         r["emergency_available"] = bool(r["emergency_available"])
+        r["is_primary_trade"] = bool(r["is_primary_trade"])
         r["license_status"] = r["license_status"] or "none listed"
     return rows
 
@@ -126,6 +129,12 @@ def business_facts(con: sqlite3.Connection, business_id: str) -> dict | None:
     if not rows:
         return None
     b = rows[0]
+    # Roofing and landscaping need no Texas license, so "none on file" is only a red flag for
+    # the trades that require one. Carry that fact so callers cannot misread the absence.
+    lic = _rows(con, "SELECT license_required, license_authority FROM categories WHERE category_id = ?",
+                (b["primary_category"],))
+    b["license_required"] = bool(lic[0]["license_required"]) if lic else False
+    b["license_authority"] = lic[0]["license_authority"] if lic else None
     b["categories"] = [r["category"] for r in _rows(
         con, "SELECT category FROM business_categories WHERE business_id = ? ORDER BY is_primary DESC", (business_id,))]
     b["cities_served"] = [r["city"] for r in _rows(

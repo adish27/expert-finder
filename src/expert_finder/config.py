@@ -18,7 +18,9 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=PROJECT_ROOT / ".env", extra="ignore")
 
     openai_api_key: str | None = None
-    chat_model: str = "gpt-4o-mini"
+    # gpt-4o-mini ignores the citation and brevity instructions; 4.1-mini follows them,
+    # and is faster and cheaper. gpt-4.1 reasons best about which business to lead with.
+    chat_model: str = "gpt-4.1-mini"
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536
 

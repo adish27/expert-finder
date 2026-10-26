@@ -12,6 +12,10 @@ from pathlib import Path
 from expert_finder.dataset import Dataset
 
 SCHEMA = """
+CREATE TABLE categories (
+    category_id TEXT PRIMARY KEY, name TEXT NOT NULL, trade_noun TEXT,
+    license_required INTEGER NOT NULL, license_authority TEXT
+);
 CREATE TABLE services (
     service_id TEXT PRIMARY KEY, category TEXT NOT NULL, name TEXT NOT NULL, common_name TEXT NOT NULL,
     aliases TEXT, pricing_model TEXT NOT NULL, unit TEXT NOT NULL,
@@ -136,6 +140,11 @@ def _load(con: sqlite3.Connection, ds: Dataset) -> None:
             cols = list(rows[0])
             con.executemany(f"INSERT INTO {table} ({', '.join(cols)}) VALUES ({', '.join('?' * len(cols))})",
                             [tuple(r[c] for c in cols) for r in rows])
+
+    insert("categories", [{
+        "category_id": c["category_id"], "name": c["name"], "trade_noun": c["trade_noun"],
+        "license_required": _b(c["license_required"]), "license_authority": c["license_authority"]}
+        for c in ds.categories if c["in_dataset"]])
 
     insert("services", [{
         "service_id": s["service_id"], "category": s["category"], "name": s["name"],

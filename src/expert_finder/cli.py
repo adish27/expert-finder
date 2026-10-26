@@ -101,6 +101,26 @@ def mention_report() -> None:
     print("review experts:", json.dumps(evaluate_review_mentions(ds, r, gt / "review_expert_mentions.jsonl"), indent=1))
 
 
+def ask(question: str, mode: str, show_evidence: bool, loadout: bool) -> None:
+    from expert_finder.agent import run_agent
+    from expert_finder.app import ExpertFinder
+
+    app = ExpertFinder()
+    try:
+        r = run_agent(app, question, mode=mode, use_tool_loadout=loadout)
+        print(r.answer)
+        print(f"\n--- {r.mode} mode | " + " | ".join(f"{k}={v}" for k, v in r.stats.items()))
+        print("tools: " + ", ".join(f"{c['name']}({', '.join(f'{k}={v!r}' for k, v in c['args'].items() if v is not None)})"
+                                    for c in r.tool_calls))
+        print(f"grounded: {r.grounded}" + (f" | problems: {'; '.join(r.problems)}" if r.problems else ""))
+        if show_evidence:
+            print("\n--- evidence")
+            for e in r.evidence:
+                print(f"[{e.ref}] {e.kind} via {e.via}: {e.text[:160]}")
+    finally:
+        app.close()
+
+
 def search(query: str, namespace: str, k: int, filter_json: str | None) -> None:
     from expert_finder.vector_store import VectorIndex
 
@@ -125,6 +145,11 @@ def main() -> None:
     p = sub.add_parser("build-graph", help="build the Neo4j knowledge graph from the dataset")
     p.add_argument("--reset", action="store_true", help="delete this project's nodes before building")
     sub.add_parser("mention-report", help="score entity resolution against ground truth")
+    p = sub.add_parser("ask", help="ask the agent one question")
+    p.add_argument("question")
+    p.add_argument("--mode", choices=["vector", "graph"], default="graph")
+    p.add_argument("--evidence", action="store_true", help="print the evidence the agent retrieved")
+    p.add_argument("--loadout", action="store_true", help="bind only the top-k relevant tools per turn")
     p = sub.add_parser("search", help="semantic search in one namespace")
     p.add_argument("query")
     p.add_argument("--namespace", choices=sorted(NAMESPACES), default="reviews")
@@ -142,6 +167,8 @@ def main() -> None:
         build_graph(args.reset)
     elif args.cmd == "mention-report":
         mention_report()
+    elif args.cmd == "ask":
+        ask(args.question, args.mode, args.evidence, args.loadout)
     elif args.cmd == "search":
         search(args.query, args.namespace, args.k, args.filter)
 
