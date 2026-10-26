@@ -39,3 +39,16 @@ testpaths = ["tests"]
 markers = [
     "integration: needs live Pinecone/Neo4j credentials",
 ]
+
+[tool.ruff]
+line-length = 130
+
+[tool.ruff.lint]
+# Correctness and clarity checks; line length is not enforced (the data generator has long
+# string literals that read better unwrapped).
+select = ["F", "ARG", "I", "E7", "E9", "W"]
+
+[tool.ruff.lint.per-file-ignores]
+# Test doubles must match the interfaces they implement, and some fixtures are used
+# only for their side effects (monkeypatching).
+"tests/*" = ["ARG"]

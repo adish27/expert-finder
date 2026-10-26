@@ -200,7 +200,7 @@ def evaluate_mentions(ds: Dataset, resolver: EntityResolver, gold_path: Path) ->
 
 def evaluate_review_mentions(ds: Dataset, resolver: EntityResolver, gold_path: Path) -> dict:
     """Precision/recall of review -> expert links against ground truth."""
-    gold = {(json.loads(l)["review_id"], json.loads(l)["expert_id"]) for l in gold_path.read_text().splitlines()}
+    gold = {(json.loads(line)["review_id"], json.loads(line)["expert_id"]) for line in gold_path.read_text().splitlines()}
     pred = {(r["review_id"], m.target_id) for r in ds.reviews for m in resolver.resolve_review_experts(r)}
     tp = len(pred & gold)
     return {"predicted": len(pred), "gold": len(gold), "correct": tp,

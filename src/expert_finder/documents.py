@@ -146,8 +146,8 @@ def business_profile_text(ds: Dataset, b: dict) -> str:
              (f"Emergency service: {em['hours']}, {em['after_hours_surcharge_pct']}% after-hours surcharge."
               if em["available"] else "No emergency service.")]
     if b["licenses"]:
-        lines.append("Licenses: " + "; ".join(f"{l['type']} ({l['issuer']}) #{l['number']}, {l['status']}, "
-                                              f"expires {l['expires']}" for l in b["licenses"]) + ".")
+        lines.append("Licenses: " + "; ".join(f"{lic['type']} ({lic['issuer']}) #{lic['number']}, {lic['status']}, "
+                                              f"expires {lic['expires']}" for lic in b["licenses"]) + ".")
     else:
         lines.append("Licenses: none listed.")
     lines.append(f"Insurance: general liability {'yes' if ins['general_liability'] else 'no'} "
@@ -188,7 +188,7 @@ def business_profile_text(ds: Dataset, b: dict) -> str:
 def business_documents(ds: Dataset) -> list[Document]:
     docs = []
     for b in ds.businesses:
-        statuses = {l["status"] for l in b["licenses"]}
+        statuses = {lic["status"] for lic in b["licenses"]}
         docs.append(Document(id=b["business_id"], page_content=business_profile_text(ds, b), metadata=_clean({
             "doc_type": "business_profile", "business_id": b["business_id"], "business_name": b["name"],
             "category": b["primary_category"], "secondary_categories": b["secondary_categories"],
