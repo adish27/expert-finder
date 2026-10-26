@@ -36,3 +36,6 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "integration: needs live Pinecone/Neo4j credentials",
+]

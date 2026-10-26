@@ -62,9 +62,13 @@ def build_graph_data(ds: Dataset, resolver: EntityResolver) -> GraphData:
         g.rel("IN_CITY", "Neighborhood", _nbhd_id(city, name), "City", city)
 
     # Businesses, their offerings and their people.
+    # Roofing and landscaping need no state license in Texas, so "no license" is only a red flag
+    # for the trades that require one. The graph carries that fact so readers cannot misread it.
+    license_required = {c["category_id"]: c["license_required"] for c in ds.categories}
     for b in ds.businesses:
         statuses = {lic["status"] for lic in b["licenses"]}
         g.node("Business", b["business_id"], name=b["name"], category=b["primary_category"],
+               license_required=license_required.get(b["primary_category"], False),
                founded_year=b["founded_year"], business_size=b["business_size"],
                emergency_service=b["emergency_service"]["available"],
                license_status="expired" if "expired" in statuses else "active" if statuses else "none",
