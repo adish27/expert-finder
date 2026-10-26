@@ -169,7 +169,7 @@ def run_agent(app: ExpertFinder, question: str, mode: Mode = "graph", thread_id:
 
     return AgentResult(
         answer=final.text, mode=mode,
-        tool_calls=[{"name": c.name, "args": c.args} for c in recorder.calls],
+        tool_calls=[{"name": c.name, "args": c.args, "output": c.output} for c in recorder.calls],
         cited_refs=cited,
         unsupported_refs=[r for r in cited if r not in available],
         fabricated_phones=list(dict.fromkeys(fabricated_phones)),

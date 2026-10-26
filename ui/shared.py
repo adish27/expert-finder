@@ -23,8 +23,10 @@ MODE_HELP = {
     "vector": "Semantic search over Pinecone only, with the shared structured tools.",
 }
 
-KIND_LABEL = {"business": "Business", "review": "Review", "post": "Social post",
-              "thread": "Same thread", "graph": "Graph fact"}
+KIND_LABEL = {"business": "Businesses", "expert": "People", "review": "Reviews",
+              "post": "Social posts", "thread": "Rest of the thread", "graph": "Graph facts"}
+KIND_ORDER = ["business", "expert", "review", "post", "thread", "graph"]
+VIA_LABEL = {"vector": "semantic search", "graph": "graph traversal", "sql": "structured query"}
 
 
 @st.cache_resource(show_spinner="Connecting to Pinecone, Neo4j and SQLite...")
@@ -109,7 +111,7 @@ def render_evidence(result) -> None:
                    "see 'What the agent did' for the raw tool output.")
         return
     cited = set(result.cited_refs)
-    for kind in ("business", "review", "post", "thread", "graph"):
+    for kind in KIND_ORDER:
         group = [e for e in result.evidence if e.kind == kind]
         if not group:
             continue
@@ -121,14 +123,22 @@ def render_evidence(result) -> None:
                      or source.get("platform") or e.kind)
             meta = " · ".join(str(x) for x in [source.get("platform"), label, source.get("created_date"),
                                                f"score {e.score}" if e.score else None,
-                                               f"via {e.via}"] if x)
+                                               VIA_LABEL.get(e.via, e.via)] if x)
             with st.expander(f"`[{e.ref}]` {meta} {used}"):
                 st.write(e.text)
-                st.caption(f"id: `{source.get('id')}`")
+                caption = f"id: `{source.get('id')}`"
+                if source.get("relation"):
+                    caption += f" · {source['relation'].replace('_', ' ')}"
+                st.caption(caption)
 
 
 def render_tool_trace(result) -> None:
+    """Each tool call with its arguments and full output.
+
+    Price and quote tools return no record ids to cite, so their numbers only appear here.
+    """
     for call in result.tool_calls:
         args = ", ".join(f"{k}={v!r}" for k, v in call["args"].items() if v is not None)
-        st.markdown(f"- `{call['name']}({args})`")
+        st.markdown(f"**`{call['name']}({args})`**")
+        st.code(call.get("output", "") or "(no output)", language=None, wrap_lines=True)
     st.caption(" · ".join(f"{k}: {v}" for k, v in result.stats.items()))

@@ -18,7 +18,7 @@ from langchain_core.tools import BaseTool, tool
 from expert_finder import graph_queries as gq
 from expert_finder import sql_queries as sq
 from expert_finder.app import ExpertFinder, Mode
-from expert_finder.retrieval import EvidenceBundle
+from expert_finder.retrieval import Evidence, EvidenceBundle
 
 # Tools available in both modes; the rest are graph-only.
 SHARED_TOOLS = ["search_reviews_and_posts", "search_business_profiles", "find_businesses",
@@ -32,6 +32,7 @@ class ToolCall:
     args: dict[str, Any]
     output: str
     evidence: EvidenceBundle | None = None
+    items: list[Evidence] = field(default_factory=list)
 
 
 @dataclass
@@ -40,16 +41,28 @@ class ToolRecorder:
 
     calls: list[ToolCall] = field(default_factory=list)
 
-    def record(self, name: str, args: dict, output: str, evidence: EvidenceBundle | None = None) -> str:
-        self.calls.append(ToolCall(name=name, args=args, output=output, evidence=evidence))
+    def record(self, name: str, args: dict, output: str, evidence: EvidenceBundle | None = None,
+               items: list[Evidence] | None = None) -> str:
+        self.calls.append(ToolCall(name=name, args=args, output=output, evidence=evidence,
+                                   items=items or []))
         return output
 
     @property
     def bundles(self) -> list[EvidenceBundle]:
         return [c.evidence for c in self.calls if c.evidence is not None]
 
-    def evidence_items(self) -> list:
-        return [item for b in self.bundles for item in b.items]
+    def evidence_items(self) -> list[Evidence]:
+        """Every citable item this run produced, deduplicated by ref.
+
+        Structured tools use the record id as the ref (biz_0080), so the same business reached by
+        two tools collapses to one card; the richer description wins.
+        """
+        out: dict[str, Evidence] = {}
+        for call in self.calls:
+            for item in [*(call.evidence.items if call.evidence else []), *call.items]:
+                if item.ref not in out or len(item.text) > len(out[item.ref].text):
+                    out[item.ref] = item
+        return list(out.values())
 
     def reset(self) -> None:
         self.calls.clear()
@@ -173,9 +186,14 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
                     f"{r['typical_days_to_schedule']} days out; "
                     f"hourly {_usd(r['hourly_rate_usd'])}{price}; phone {r['phone']}")
             text = "\n".join(lines)
+        items = [Evidence(ref=r["business_id"], kind="business", via="sql", text=line.lstrip("- "),
+                          source={"id": r["business_id"], "business_name": r["name"],
+                                  "category": r["primary_category"], "rating": r["avg_rating"],
+                                  "relation": "matched_filters"})
+                 for r, line in zip(rows, lines[len(notes) + 1:], strict=False)]
         return recorder.record("find_businesses", {"category": category, "city": city, "service": service,
                                                    "emergency_only": emergency_only, "language": language,
-                                                   "min_rating": min_rating}, text)
+                                                   "min_rating": min_rating}, text, items=items)
 
     @tool
     def get_price_range(service: str, city: str | None = None) -> str:
@@ -235,6 +253,7 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
         any good, trustworthy, legitimate, or has got worse.
         """
         b = resolve_one_business(business_name)
+        items: list[Evidence] = []
         if not b:
             text = f"No business found matching {business_name!r}."
         else:
@@ -282,7 +301,11 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
                                      f"{t['years_experience']}y)" for t in facts["team"]) + ".",
             ]
             text = "\n".join(lines)
-        return recorder.record("get_business_report", {"business_name": business_name}, text)
+            items = [Evidence(ref=b["business_id"], kind="business", via="sql", text=text,
+                              source={"id": b["business_id"], "business_name": facts["name"],
+                                      "category": facts["primary_category"], "rating": ratings["avg_rating"],
+                                      "relation": "trust_report"})]
+        return recorder.record("get_business_report", {"business_name": business_name}, text, items=items)
 
     # --- graph-only tools -----------------------------------------------------
 
@@ -297,6 +320,7 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
         """
         rows = gq.neighbor_recommendations(app.driver, app.database, neighborhood=neighborhood, city=city,
                                            category=category, limit=6)
+        items: list[Evidence] = []
         if not rows:
             text = f"No neighborhood posts found for {neighborhood or city or 'that area'}."
         else:
@@ -310,9 +334,18 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
                     f"{r['reviews']} reviews; phone {r['phone']}")
                 for ex in r["examples"][:2]:
                     lines.append(f"    [{ex['post_id']}] {ex['post_type'].replace('_', ' ')}: \"{ex['text']}\"")
+                    items.append(Evidence(
+                        ref=ex["post_id"], kind="post", via="graph", text=ex["text"],
+                        source={"id": ex["post_id"], "post_type": ex["post_type"], "platform": "nextdoor",
+                                "business_name": r["business_name"], "community": ", ".join(r["neighborhoods"]),
+                                "relation": "neighbour_word_of_mouth"}))
+                items.append(Evidence(
+                    ref=r["business_id"], kind="business", via="graph", text=lines[-1 - len(r["examples"][:2])].lstrip("- "),
+                    source={"id": r["business_id"], "business_name": r["business_name"], "rating": r["avg_rating"],
+                            "category": r["category"], "relation": "recommended_by_neighbours"}))
             text = "\n".join(lines)
         return recorder.record("neighbor_recommendations",
-                               {"neighborhood": neighborhood, "city": city, "category": category}, text)
+                               {"neighborhood": neighborhood, "city": city, "category": category}, text, items=items)
 
     @tool
     def who_to_ask_for(business_name: str) -> str:
@@ -322,6 +355,7 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
         company. Works by matching the people named in reviews to that company's staff.
         """
         b = resolve_one_business(business_name)
+        items: list[Evidence] = []
         if not b:
             text = f"No business found matching {business_name!r}."
         else:
@@ -337,8 +371,20 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
                                  + (f"; works on {', '.join(r['specialties'][:3])}" if r["specialties"] else ""))
                     for ex in r["example_reviews"][:1]:
                         lines.append(f"    [{ex['review_id']}] \"{ex['text'][:200]}\"")
+                        items.append(Evidence(
+                            ref=ex["review_id"], kind="review", via="graph", text=ex["text"],
+                            source={"id": ex["review_id"], "business_name": b["name"],
+                                    "relation": "names_this_person"}))
+                    items.append(Evidence(
+                        ref=r["expert_id"], kind="expert", via="graph",
+                        text=f"{r['name']} — {r['role']}, {r['years_experience']} years. Named in "
+                             f"{r['good_reviews']} good and {r['poor_reviews']} poor reviews "
+                             f"(average {r['avg_rating']})."
+                             + (f" Works on {', '.join(r['specialties'][:3])}." if r["specialties"] else ""),
+                        source={"id": r["expert_id"], "business_name": b["name"], "rating": r["avg_rating"],
+                                "relation": "praised_in_reviews"}))
                 text = "\n".join(lines)
-        return recorder.record("who_to_ask_for", {"business_name": business_name}, text)
+        return recorder.record("who_to_ask_for", {"business_name": business_name}, text, items=items)
 
     @tool
     def check_review_authenticity(business_name: str) -> str:
@@ -350,6 +396,7 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
         from that business, which is far stronger evidence than the review text alone.
         """
         b = resolve_one_business(business_name)
+        items: list[Evidence] = []
         if not b:
             text = f"No business found matching {business_name!r}."
         else:
@@ -364,7 +411,10 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
                              f"reviews averaging {row['avg_rating']}, posted between {row['earliest']} and "
                              f"{row['latest']}, with an average of {row['avg_reviewer_history']} reviews per account")
             text = "\n".join(lines)
-        return recorder.record("check_review_authenticity", {"business_name": business_name}, text)
+            items = [Evidence(ref=f"{b['business_id']}-authenticity", kind="graph", via="graph", text=text,
+                              source={"id": b["business_id"], "business_name": b["name"],
+                                      "relation": "review_authenticity"})]
+        return recorder.record("check_review_authenticity", {"business_name": business_name}, text, items=items)
 
     tools = [search_reviews_and_posts, search_business_profiles, find_businesses, get_price_range,
              check_quote, get_business_report]
