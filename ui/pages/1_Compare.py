@@ -17,12 +17,16 @@ from expert_finder.agent import run_agent
 
 st.set_page_config(page_title="Vector vs Graph RAG", page_icon="⚖️", layout="wide")
 
+# The graph-only questions come first: those are where the two modes differ most, because
+# vector mode has to answer them without the graph tools.
 QUESTIONS = [
-    "Who do my neighbours use for sprinkler repair?",
-    "Is Bee Cave Roofing legit? I'm seeing a lot of 5-star reviews.",
+    "Who do people in Mueller use for landscaping?",
+    "Are Bee Cave Roofing's 5-star reviews real? Something feels off.",
+    "Who should I ask for at Cool Capitol City HVAC?",
+    "What do people say about plumbers pushing work you don't need?",
     "Has Hill Country Air got worse recently?",
-    "Who's the best person to ask for at Cool Capitol City HVAC?",
-    "My water heater is leaking in the garage. Who can come out today?",
+    "My AC died and it's 104 out in Round Rock. Who can come today?",
+    "A roofer quoted me $21,000 for 28 squares. Am I being overcharged?",
 ]
 
 st.title("⚖️ Vector RAG vs Graph RAG")

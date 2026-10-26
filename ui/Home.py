@@ -9,13 +9,25 @@ from shared import ask, check_stores, render_evidence, render_grounding, render_
 
 st.set_page_config(page_title="Home Services Expert Finder", page_icon="🔧", layout="wide")
 
-EXAMPLES = [
-    "My water heater is leaking in the garage. Who can come out today?",
-    "Is Bee Cave Roofing legit? I'm seeing a lot of 5-star reviews.",
-    "I was quoted $21,000 for a new roof, about 28 squares. Is that fair?",
-    "Who do my neighbours use for sprinkler repair?",
-    "Who's the best electrician for a Tesla charger install?",
-]
+# One question per tool, grouped by how the answer is found. Each was checked to route to the
+# tool it is meant to demonstrate.
+EXAMPLE_GROUPS = {
+    "Semantic search over text": [
+        ("What do people say about plumbers pushing work you don't need?", "search_reviews_and_posts"),
+        ("Who installs tankless water heaters and speaks Spanish?", "search_business_profiles"),
+    ],
+    "Structured lookups (SQL)": [
+        ("My AC died and it's 104 out in Round Rock. Who can come today?", "find_businesses"),
+        ("What should a new AC system cost in Round Rock?", "get_price_range"),
+        ("A roofer quoted me $21,000 for 28 squares. Am I being overcharged?", "check_quote"),
+        ("Has Hill Country Air got worse recently?", "get_business_report"),
+    ],
+    "Graph traversal (Neo4j)": [
+        ("Who do people in Mueller use for landscaping?", "neighbor_recommendations"),
+        ("Who should I ask for at Cool Capitol City HVAC?", "who_to_ask_for"),
+        ("Are Bee Cave Roofing's 5-star reviews real? Something feels off.", "check_review_authenticity"),
+    ],
+}
 
 st.title("🔧 Home Services Expert Finder")
 st.caption("Plumbing, electrical, HVAC, roofing and landscaping in the Austin, TX area. "
@@ -42,14 +54,21 @@ with st.sidebar:
         st.session_state.history = []
         st.rerun()
 
-# Example prompts, shown only before the first question.
+# Example prompts, shown only before the first question. Grouped so the pills also show which
+# part of the system answers each kind of question.
 pending = None
 if not st.session_state.history:
-    st.markdown("**Try one of these:**")
-    columns = st.columns(len(EXAMPLES))
-    for column, example in zip(columns, EXAMPLES, strict=True):
-        if column.button(example, use_container_width=True):
-            pending = example
+    st.markdown("**Try one of these** — each one exercises a different part of the system:")
+    for column, (group, examples) in zip(st.columns(len(EXAMPLE_GROUPS)), EXAMPLE_GROUPS.items(), strict=True):
+        with column:
+            st.caption(f"**{group}**")
+            for example, tool in examples:
+                if st.button(example, use_container_width=True, key=f"ex_{tool}",
+                             help=f"Expected to use the `{tool}` tool"):
+                    pending = example
+    if ctx["mode"] == "vector":
+        st.caption("In vector mode the three graph questions still get answered, but without the "
+                   "graph tools — a good way to see what the graph adds.")
 
 for turn in st.session_state.history:
     with st.chat_message(turn["role"]):
