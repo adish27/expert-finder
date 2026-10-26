@@ -35,9 +35,13 @@ def get_app() -> ExpertFinder:
     return ExpertFinder()
 
 
-@st.cache_resource
+@st.cache_data(ttl=60, show_spinner=False)
 def check_stores() -> dict[str, str]:
-    """Report anything missing, so the UI can explain rather than throw."""
+    """Report anything missing, so the UI can explain rather than throw.
+
+    Cached briefly rather than for the process lifetime: building a missing store should clear
+    the warning on the next interaction, not require restarting the server.
+    """
     app = get_app()
     problems = {}
     s = get_settings()

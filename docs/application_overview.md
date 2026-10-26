@@ -22,8 +22,10 @@ needs, instead of searching one big index:
 
 Answers must be grounded. Every recommendation cites its evidence, and the assistant says so when the
 evidence is thin rather than guessing. It also surfaces red flags: invoices well above the quote,
-unresolved complaints, expired licenses and suspicious bursts of reviews. mem0 holds user memory, and
-LangSmith traces every step of retrieval and reasoning.
+unresolved complaints, expired licenses and suspicious bursts of reviews. LangSmith traces every step
+of retrieval and reasoning. Within a session the agent remembers the conversation, so follow-ups like
+"what about their insurance?" work; cross-session memory of a homeowner's city, home and past projects
+is planned via mem0 and not built yet.
 
 The application is also an experiment comparing two retrieval approaches on the same questions:
 - **Vector RAG** answers from semantically similar text chunks alone.

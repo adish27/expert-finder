@@ -168,6 +168,7 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
             # For an urgent job, how fast they answer matters more than the star rating.
             rows.sort(key=lambda r: (r["typical_reply_hours"], -(r["avg_rating"] or 0)))
             notes.append("Sorted by how fast they respond, because this is an urgent request.")
+        items: list[Evidence] = []
         if not rows:
             text = "No businesses match those filters. Try relaxing the city or the rating floor."
         else:
@@ -177,20 +178,22 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
                          if r.get("typical_price_usd") else "")
                 trade = ("" if r["is_primary_trade"] else
                          f", {category} is a SIDELINE for them, their main trade is {r['primary_category']}")
-                lines.append(
-                    f"- [{r['business_id']}] {r['name']} ({r['primary_category']}, based in {r['based_in']}{trade}): "
+                # Build the description once and use it for both the model's text and the evidence
+                # card, so the two can never drift apart.
+                described = (
+                    f"{r['name']} ({r['primary_category']}, based in {r['based_in']}{trade}): "
                     f"rated {r['avg_rating']} from {r['rated_reviews']} reviews, {r['complaints']} complaints; "
                     f"license {r['license_status']}; "
                     f"{'takes 24/7 emergency calls' if r['emergency_available'] else 'no emergency service'}; "
                     f"replies in ~{r['typical_reply_hours']}h; books routine work ~"
                     f"{r['typical_days_to_schedule']} days out; "
                     f"hourly {_usd(r['hourly_rate_usd'])}{price}; phone {r['phone']}")
+                lines.append(f"- [{r['business_id']}] {described}")
+                items.append(Evidence(ref=r["business_id"], kind="business", via="sql", text=described,
+                                      source={"id": r["business_id"], "business_name": r["name"],
+                                              "category": r["primary_category"], "rating": r["avg_rating"],
+                                              "relation": "matched_filters"}))
             text = "\n".join(lines)
-        items = [Evidence(ref=r["business_id"], kind="business", via="sql", text=line.lstrip("- "),
-                          source={"id": r["business_id"], "business_name": r["name"],
-                                  "category": r["primary_category"], "rating": r["avg_rating"],
-                                  "relation": "matched_filters"})
-                 for r, line in zip(rows, lines[len(notes) + 1:], strict=False)]
         return recorder.record("find_businesses", {"category": category, "city": city, "service": service,
                                                    "emergency_only": emergency_only, "language": language,
                                                    "min_rating": min_rating}, text, items=items)
@@ -327,11 +330,16 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
             lines = [f"Word of mouth in {neighborhood or city}"
                      + (f" for {category}" if category else "") + ":"]
             for r in rows:
-                lines.append(
-                    f"- [{r['business_id']}] {r['business_name']}: {r['positive_posts']} recommendation(s), "
+                described = (
+                    f"{r['business_name']}: {r['positive_posts']} recommendation(s), "
                     f"{r['negative_posts']} warning(s) from residents of "
                     f"{', '.join(r['neighborhoods'])}; overall rating {r['avg_rating']} from "
                     f"{r['reviews']} reviews; phone {r['phone']}")
+                lines.append(f"- [{r['business_id']}] {described}")
+                items.append(Evidence(
+                    ref=r["business_id"], kind="business", via="graph", text=described,
+                    source={"id": r["business_id"], "business_name": r["business_name"], "rating": r["avg_rating"],
+                            "category": r["category"], "relation": "recommended_by_neighbours"}))
                 for ex in r["examples"][:2]:
                     lines.append(f"    [{ex['post_id']}] {ex['post_type'].replace('_', ' ')}: \"{ex['text']}\"")
                     items.append(Evidence(
@@ -339,10 +347,6 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
                         source={"id": ex["post_id"], "post_type": ex["post_type"], "platform": "nextdoor",
                                 "business_name": r["business_name"], "community": ", ".join(r["neighborhoods"]),
                                 "relation": "neighbour_word_of_mouth"}))
-                items.append(Evidence(
-                    ref=r["business_id"], kind="business", via="graph", text=lines[-1 - len(r["examples"][:2])].lstrip("- "),
-                    source={"id": r["business_id"], "business_name": r["business_name"], "rating": r["avg_rating"],
-                            "category": r["category"], "relation": "recommended_by_neighbours"}))
             text = "\n".join(lines)
         return recorder.record("neighbor_recommendations",
                                {"neighborhood": neighborhood, "city": city, "category": category}, text, items=items)
