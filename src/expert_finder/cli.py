@@ -62,6 +62,17 @@ def index(namespaces: list[str], reset: bool) -> None:
     print("index stats:", json.dumps(vi.stats()))
 
 
+def build_sql() -> None:
+    from expert_finder import sql_store
+
+    s = get_settings()
+    path = s.storage_dir / "home_services.db"
+    counts = sql_store.build(Dataset.load(s.data_dir), path)
+    print(f"built {path}")
+    for table, n in counts.items():
+        print(f"  {table:24} {n:6}")
+
+
 def search(query: str, namespace: str, k: int, filter_json: str | None) -> None:
     from expert_finder.vector_store import VectorIndex
 
@@ -82,6 +93,7 @@ def main() -> None:
     p.add_argument("--namespace", choices=sorted(NAMESPACES), action="append",
                    help="limit to one namespace (repeatable); default: all")
     p.add_argument("--reset", action="store_true", help="delete each namespace's vectors before upserting")
+    sub.add_parser("build-sql", help="rebuild the SQLite store from the dataset")
     p = sub.add_parser("search", help="semantic search in one namespace")
     p.add_argument("query")
     p.add_argument("--namespace", choices=sorted(NAMESPACES), default="reviews")
@@ -93,6 +105,8 @@ def main() -> None:
         check()
     elif args.cmd == "index":
         index(args.namespace or list(NAMESPACES), args.reset)
+    elif args.cmd == "build-sql":
+        build_sql()
     elif args.cmd == "search":
         search(args.query, args.namespace, args.k, args.filter)
 
