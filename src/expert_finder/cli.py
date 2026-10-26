@@ -73,6 +73,34 @@ def build_sql() -> None:
         print(f"  {table:24} {n:6}")
 
 
+def build_graph(reset: bool) -> None:
+    from expert_finder import graph_builder
+    from expert_finder.entity_resolution import EntityResolver
+    from expert_finder.graph_db import neo4j_driver
+
+    s = get_settings()
+    ds = Dataset.load(s.data_dir)
+    data = graph_builder.build_graph_data(ds, EntityResolver(ds))
+    print("prepared " + ", ".join(f"{len(v)} {k}" for k, v in data.nodes.items())
+          + f", {sum(len(v) for v in data.rels.values())} relationships")
+    with neo4j_driver(s) as driver:
+        if reset:
+            graph_builder.clear(driver, s.neo4j_database)
+        print("graph:", json.dumps(graph_builder.write(driver, s.neo4j_database, data), indent=1))
+
+
+def mention_report() -> None:
+    """Accuracy of our entity resolution, scored against ground truth (evaluation only)."""
+    from expert_finder.entity_resolution import EntityResolver, evaluate_mentions, evaluate_review_mentions
+
+    s = get_settings()
+    ds = Dataset.load(s.data_dir)
+    r = EntityResolver(ds)
+    gt = s.data_dir / "ground_truth"
+    print("social posts:", json.dumps(evaluate_mentions(ds, r, gt / "social_mentions.jsonl"), indent=1))
+    print("review experts:", json.dumps(evaluate_review_mentions(ds, r, gt / "review_expert_mentions.jsonl"), indent=1))
+
+
 def search(query: str, namespace: str, k: int, filter_json: str | None) -> None:
     from expert_finder.vector_store import VectorIndex
 
@@ -94,6 +122,9 @@ def main() -> None:
                    help="limit to one namespace (repeatable); default: all")
     p.add_argument("--reset", action="store_true", help="delete each namespace's vectors before upserting")
     sub.add_parser("build-sql", help="rebuild the SQLite store from the dataset")
+    p = sub.add_parser("build-graph", help="build the Neo4j knowledge graph from the dataset")
+    p.add_argument("--reset", action="store_true", help="delete this project's nodes before building")
+    sub.add_parser("mention-report", help="score entity resolution against ground truth")
     p = sub.add_parser("search", help="semantic search in one namespace")
     p.add_argument("query")
     p.add_argument("--namespace", choices=sorted(NAMESPACES), default="reviews")
@@ -107,6 +138,10 @@ def main() -> None:
         index(args.namespace or list(NAMESPACES), args.reset)
     elif args.cmd == "build-sql":
         build_sql()
+    elif args.cmd == "build-graph":
+        build_graph(args.reset)
+    elif args.cmd == "mention-report":
+        mention_report()
     elif args.cmd == "search":
         search(args.query, args.namespace, args.k, args.filter)
 

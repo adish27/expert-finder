@@ -1061,11 +1061,20 @@ def main() -> None:
                 "created_at": ts(created), "text": text, "media": media or [], "hashtags": hashtags or [],
                 "engagement": engagement(platform, boost)}
         posts.append(post)
+        visible = " ".join([text, *(m.get("transcript", "") for m in post["media"])])
         for b, form, expert, sentiment in mentions:
+            if expert and not re.search(rf"\b{re.escape(expert['goes_by'])}\b", visible):
+                expert = None  # only label experts whose name actually appears in the post
             social_mentions.append({"post_id": pid, "business_id": b.id, "surface_form": form,
                                     "expert_id": expert["expert_id"] if expert else None,
                                     "expert_surface_form": expert["goes_by"] if expert else None,
                                     "sentiment": sentiment, "source_job_id": job.job_id if job else None})
+            # "Mike at Ace Plumbing" / "Mike the plumber" also names the owner; label that too.
+            owner = b.owner
+            if form.startswith(f"{owner['goes_by']} ") and (expert is None or expert is not owner):
+                social_mentions.append({"post_id": pid, "business_id": b.id, "surface_form": form,
+                                        "expert_id": owner["expert_id"], "expert_surface_form": owner["goes_by"],
+                                        "sentiment": sentiment, "source_job_id": job.job_id if job else None})
         return post
 
     def customer_author(c: dict, platform: str) -> dict:

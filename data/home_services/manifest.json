@@ -20,7 +20,7 @@
     "estimates.jsonl": 1258,
     "reviews.jsonl": 2041,
     "social_posts.jsonl": 884,
-    "ground_truth/social_mentions.jsonl": 716,
+    "ground_truth/social_mentions.jsonl": 945,
     "ground_truth/review_flags.jsonl": 231
   },
   "summary": {
