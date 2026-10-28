@@ -17,7 +17,7 @@ from langchain_core.messages import AIMessage, ToolMessage
 from langgraph.checkpoint.memory import InMemorySaver
 
 from expert_finder.app import ExpertFinder, Mode
-from expert_finder.tools import GRAPH_TOOLS, SHARED_TOOLS, ToolRecorder, build_tools
+from expert_finder.tools import ToolRecorder, build_tools
 
 SYSTEM_PROMPT = """You are Expert Finder, an assistant that helps homeowners in the Austin, Texas area \
 find the right professional for plumbing, electrical, HVAC, roofing and landscaping work.
@@ -104,10 +104,6 @@ def _refs_in(text: str) -> list[str]:
 
 def _digits(phone: str) -> str:
     return re.sub(r"\D", "", phone)
-
-
-def tool_names(mode: Mode) -> list[str]:
-    return SHARED_TOOLS + (GRAPH_TOOLS if mode == "graph" else [])
 
 
 def build_agent(app: ExpertFinder, mode: Mode, use_tool_loadout: bool = False,

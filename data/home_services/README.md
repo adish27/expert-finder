@@ -65,7 +65,7 @@ handyman are reserved in `reference/categories.json` (`in_dataset: false`) for a
 | `manifest.json` | — | counts, seed, date range, disclaimer |
 
 Format: **JSON Lines** for record sets (one JSON object per line; nested fields like line items and
-sub-ratings stay intact; `pd.read_json(path, lines=True)` works), **JSON** for small reference tables.
+sub-ratings stay intact; readable with `pandas.read_json(path, lines=True)` if you have pandas), **JSON** for small reference tables.
 Conventions: ids are opaque prefixed strings (`biz_0001`, `exp_0001`, `off_00001`, `cust_00001`,
 `est_00001`, `rev_000001`, `post_00001`, `thr_0001`, `proj_00001`); timestamps are ISO 8601 with the
 America/Chicago offset; dates are `YYYY-MM-DD`; money is USD in fields ending `_usd`; missing values are `null`.

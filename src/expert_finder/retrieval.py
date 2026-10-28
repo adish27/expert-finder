@@ -20,6 +20,7 @@ from pydantic import BaseModel, Field
 
 from expert_finder import graph_queries as gq
 from expert_finder.documents import NAMESPACES
+from expert_finder.formatting import usd
 from expert_finder.vector_store import VectorIndex
 
 # Which namespaces a mode searches when the caller does not say.
@@ -79,10 +80,6 @@ class _RefMaker:
     def next(self, kind: str) -> str:
         self._counts[kind] = self._counts.get(kind, 0) + 1
         return f"{REF_PREFIX[kind]}{self._counts[kind]}"
-
-
-def _usd(x: float | None) -> str:
-    return f"${x:,.0f}" if x is not None else "n/a"
 
 
 def _license_phrase(status: str, required: bool) -> str:
@@ -232,8 +229,8 @@ class GraphRetriever:
         parts.append(f"That business averages {row['business_avg_rating']} over "
                      f"{row['business_rated_reviews']} ratings with {row['business_complaints']} complaints.")
         if row["quoted_usd"]:
-            parts.append(f"The job behind this review was quoted {_usd(row['quoted_usd'])} and invoiced "
-                         f"{_usd(row['final_invoice_usd'])}.")
+            parts.append(f"The job behind this review was quoted {usd(row['quoted_usd'])} and invoiced "
+                         f"{usd(row['final_invoice_usd'])}.")
         return " ".join(parts)
 
     @staticmethod
@@ -252,13 +249,13 @@ class GraphRetriever:
         parts = [f"{row['business_name']} ({row['category']}, based in {row['based_in']}, "
                  f"phone {row['phone']}, {_license_phrase(row['license_status'], row['license_required'])},"
                  f"{' emergency service,' if row['emergency_service'] else ''} "
-                 f"hourly rate {_usd(row['hourly_rate_usd'])})."]
+                 f"hourly rate {usd(row['hourly_rate_usd'])})."]
         if row["avg_rating"] is not None:
             parts.append(f"Averages {row['avg_rating']} over {row['rated_reviews']} ratings "
                          f"with {row['complaints']} complaints.")
         for p in row["prices"]:
-            parts.append(f"{p['service']}: {_usd(p['price_low_usd'])}-{_usd(p['price_high_usd'])} "
-                         f"per {p['unit']} (typical {_usd(p['typical_price_usd'])}).")
+            parts.append(f"{p['service']}: {usd(p['price_low_usd'])}-{usd(p['price_high_usd'])} "
+                         f"per {p['unit']} (typical {usd(p['typical_price_usd'])}).")
         if mention.get("matched_text"):
             parts.append(f"Surfaced from a social post that called it \"{mention['matched_text']}\".")
         return " ".join(parts)

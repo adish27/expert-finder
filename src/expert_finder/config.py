@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     pinecone_cloud: str = "aws"
     pinecone_region: str = "us-east-1"
 
-    neo4j_uri: str = "bolt://localhost:7687"
+    neo4j_uri: str = "bolt://localhost:7687"  # Aura instances use neo4j+s://<id>.databases.neo4j.io
     neo4j_username: str = "neo4j"
     neo4j_password: str = "password"
     neo4j_database: str = "neo4j"

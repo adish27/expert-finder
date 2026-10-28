@@ -29,7 +29,6 @@ START = date(2021, 1, 1)
 TZ = ZoneInfo("America/Chicago")
 OUT = Path(__file__).resolve().parents[1] / "data" / "home_services"
 CATEGORY_IDS = ["plumbing", "electrical", "hvac", "roofing", "landscaping"]
-BUSINESSES_PER_CATEGORY = 20
 N_CUSTOMERS = 1400
 
 rng = random.Random(SEED)
@@ -523,7 +522,6 @@ class Job:
     biz: Biz
     customer: dict
     service: cat.Service
-    offering: dict
     expert: dict | None
     date: date
     quantity: float
@@ -875,7 +873,7 @@ def main() -> None:
             quote = round_price(clamp(unit_price, off["price_low_usd"], off["price_high_usd"]) * qty)
             outcome = job_outcome(b, d)
             final = round_price(quote * (1 + outcome["overrun_pct"]))
-            job = Job(next_job(), b, customer, svc, off, expert, d, qty, quote, final, outcome)
+            job = Job(next_job(), b, customer, svc, expert, d, qty, quote, final, outcome)
             jobs.append(job)
 
             big = quote >= 1500

@@ -27,6 +27,7 @@ src/expert_finder/
   retrieval.py       VectorRetriever and GraphRetriever -> a shared EvidenceBundle
   app.py             container holding the three stores (connections cached, SQLite thread-local)
   tools.py           9 agent tools (6 shared, 3 graph-only) + the tool-call recorder
+  formatting.py      shared money/name formatting
   agent.py           LangGraph agent, system prompt, and answer verification
   embeddings.py      OpenAI text-embedding-3-small
   tool_loadout.py    LangChain middleware that binds only the top-k relevant tools per question

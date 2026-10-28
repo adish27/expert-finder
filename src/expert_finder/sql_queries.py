@@ -8,16 +8,14 @@ import sqlite3
 from datetime import date
 from statistics import mean, median, quantiles
 
+from expert_finder.formatting import short_name
+
 NEW_ACCOUNT_MAX_REVIEWS = 2  # reviewers with this many reviews or fewer count as brand-new accounts
 OVER_QUOTE_THRESHOLD = 0.05  # a final bill more than 5% above the quote counts as "over quote"
 
 
 def _rows(con: sqlite3.Connection, sql: str, params=()) -> list[dict]:
     return [dict(r) for r in con.execute(sql, params)]
-
-
-def _short(name: str) -> str:
-    return re.sub(r"\s+(LLC|Inc\.?|Co\.)$", "", name).strip()
 
 
 def _norm(s: str) -> str:
@@ -41,7 +39,7 @@ def resolve_business(con: sqlite3.Connection, name: str, limit: int = 3) -> list
     candidates = _rows(con, "SELECT business_id, name, primary_category, city FROM businesses")
     scored = []
     for c in candidates:
-        full, short = _norm(c["name"]), _norm(_short(c["name"]))
+        full, short = _norm(c["name"]), _norm(short_name(c["name"]))
         if q in (full, short):
             score = 1.0
         elif full.startswith(q) or short.startswith(q) or (len(q) >= 4 and q in full):

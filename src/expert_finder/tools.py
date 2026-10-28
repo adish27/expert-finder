@@ -18,12 +18,8 @@ from langchain_core.tools import BaseTool, tool
 from expert_finder import graph_queries as gq
 from expert_finder import sql_queries as sq
 from expert_finder.app import ExpertFinder, Mode
+from expert_finder.formatting import usd
 from expert_finder.retrieval import Evidence, EvidenceBundle
-
-# Tools available in both modes; the rest are graph-only.
-SHARED_TOOLS = ["search_reviews_and_posts", "search_business_profiles", "find_businesses",
-                "get_price_range", "check_quote", "get_business_report"]
-GRAPH_TOOLS = ["neighbor_recommendations", "who_to_ask_for", "check_review_authenticity"]
 
 
 @dataclass
@@ -47,10 +43,6 @@ class ToolRecorder:
                                    items=items or []))
         return output
 
-    @property
-    def bundles(self) -> list[EvidenceBundle]:
-        return [c.evidence for c in self.calls if c.evidence is not None]
-
     def evidence_items(self) -> list[Evidence]:
         """Every citable item this run produced, deduplicated by ref.
 
@@ -68,15 +60,11 @@ class ToolRecorder:
         self.calls.clear()
 
 
-def _usd(x: float | None) -> str:
-    return f"${x:,.0f}" if x is not None else "n/a"
-
-
 def _quartile_line(label: str, q: dict | None) -> str:
     if not q:
         return f"{label}: no data"
-    return (f"{label}: {q['n']} data points, median {_usd(q['median'])} "
-            f"(25th-75th percentile {_usd(q['p25'])}-{_usd(q['p75'])}, full range {_usd(q['min'])}-{_usd(q['max'])})")
+    return (f"{label}: {q['n']} data points, median {usd(q['median'])} "
+            f"(25th-75th percentile {usd(q['p25'])}-{usd(q['p75'])}, full range {usd(q['min'])}-{usd(q['max'])})")
 
 
 def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[BaseTool]:
@@ -174,7 +162,7 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
         else:
             lines = notes + [f"{len(rows)} matches, best rated first:"]
             for r in rows:
-                price = (f", {service} typically {_usd(r['typical_price_usd'])} per {r['price_unit']}"
+                price = (f", {service} typically {usd(r['typical_price_usd'])} per {r['price_unit']}"
                          if r.get("typical_price_usd") else "")
                 trade = ("" if r["is_primary_trade"] else
                          f", {category} is a SIDELINE for them, their main trade is {r['primary_category']}")
@@ -187,7 +175,7 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
                     f"{'takes 24/7 emergency calls' if r['emergency_available'] else 'no emergency service'}; "
                     f"replies in ~{r['typical_reply_hours']}h; books routine work ~"
                     f"{r['typical_days_to_schedule']} days out; "
-                    f"hourly {_usd(r['hourly_rate_usd'])}{price}; phone {r['phone']}")
+                    f"hourly {usd(r['hourly_rate_usd'])}{price}; phone {r['phone']}")
                 lines.append(f"- [{r['business_id']}] {described}")
                 items.append(Evidence(ref=r["business_id"], kind="business", via="sql", text=described,
                                       source={"id": r["business_id"], "business_name": r["name"],
@@ -214,7 +202,7 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
             adv = stats["advertised"]
             lines = [f"{svc['name']} in {stats['city']} (priced per {stats['service']['unit']}):",
                      f"- {adv['businesses']} businesses offer it; advertised from "
-                     f"{_usd(adv['lowest_advertised'])} to {_usd(adv['highest_advertised'])}",
+                     f"{usd(adv['lowest_advertised'])} to {usd(adv['highest_advertised'])}",
                      "- " + _quartile_line("Real quotes issued", stats["quotes"]),
                      "- " + _quartile_line("Final invoices on completed jobs", stats["final_invoices"])]
             if stats["quotes_per_unit"]:
@@ -240,7 +228,7 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
             if r.get("comparable_quotes", 0) == 0:
                 text = f"No comparable quotes for {svc['name']}."
             else:
-                text = (f"{_usd(amount_usd)} for {svc['name']} is {r['verdict'].upper()}: higher than "
+                text = (f"{usd(amount_usd)} for {svc['name']} is {r['verdict'].upper()}: higher than "
                         f"{r['percentile']}% of {r['comparable_quotes']} comparable quotes. "
                         + _quartile_line("Comparable quotes", r["distribution"])
                         + (f" ({r['note']})" if r.get("note") else ""))
@@ -282,7 +270,7 @@ def build_tools(app: ExpertFinder, mode: Mode, recorder: ToolRecorder) -> list[B
                 f"Contact: {facts['phone']}. Languages: {', '.join(facts['attributes'].get('language', []))}.",
                 f"Licenses: {lic}.",
                 f"Insurance: general liability {'yes' if facts['general_liability'] else 'NO'} "
-                f"({_usd(facts['liability_coverage_usd'])}), workers comp "
+                f"({usd(facts['liability_coverage_usd'])}), workers comp "
                 f"{'yes' if facts['workers_comp'] else 'no'}, bonded {'yes' if facts['bonded'] else 'no'}.",
                 f"Warranty: {facts['warranty_months']} months workmanship. Emergency service: "
                 f"{'yes' if facts['emergency_available'] else 'no'}.",

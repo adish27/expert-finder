@@ -9,10 +9,10 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
 
-from expert_finder.agent import AgentResult, _refs_in, run_agent, tool_names
+from expert_finder.agent import AgentResult, _refs_in, run_agent
 from expert_finder.app import ExpertFinder
 from expert_finder.config import get_settings
-from expert_finder.tools import GRAPH_TOOLS, SHARED_TOOLS
+from expert_finder.tools import ToolRecorder, build_tools
 
 # --- offline: reference parsing and grounding rules ---------------------------
 
@@ -44,10 +44,8 @@ def test_grounded_requires_real_refs_real_phones_and_at_least_one_citation():
     assert not says_nothing.grounded and "no evidence" in says_nothing.problems[0]
 
 
-def test_tool_names_per_mode():
-    assert tool_names("vector") == SHARED_TOOLS
-    assert tool_names("graph") == SHARED_TOOLS + GRAPH_TOOLS
-    assert not set(SHARED_TOOLS) & set(GRAPH_TOOLS)
+def tools_for(app, mode) -> set[str]:
+    return {t.name for t in build_tools(app, mode, ToolRecorder())}
 
 
 # --- the tool-calling loop, with a scripted model -----------------------------
@@ -119,11 +117,25 @@ def test_loop_accepts_a_phone_number_a_tool_returned(app, scripted):
     assert result.fabricated_phones == [] and result.grounded
 
 
+def test_tool_loadout_binds_only_the_selected_tools(app, scripted):
+    """The loadout is opt-in, so it needs a test or it quietly rots."""
+    from expert_finder.config import get_settings
+
+    if not get_settings().openai_api_key:
+        pytest.skip("tool selection embeds tool descriptions, which needs OpenAI")
+    run_agent(app, "Who do people in Mueller use for landscaping?", mode="graph",
+              thread_id="loadout", use_tool_loadout=True)
+    bound = ScriptedModel.bound_tools
+    assert len(bound) <= get_settings().tool_loadout_k + 1   # top-k plus the always-on search tool
+    assert "search_reviews_and_posts" in bound               # the always-on one
+    assert set(bound) < tools_for(app, "graph")
+
+
 def test_graph_mode_binds_more_tools_than_vector_mode(app, scripted):
     run_agent(app, "x", mode="vector", thread_id="t5")
     vector_bound = set(ScriptedModel.bound_tools)
     run_agent(app, "x", mode="graph", thread_id="t6")
     graph_bound = set(ScriptedModel.bound_tools)
-    assert vector_bound == set(SHARED_TOOLS)
-    assert graph_bound == set(SHARED_TOOLS) | set(GRAPH_TOOLS)
+    assert vector_bound == tools_for(app, "vector")
+    assert graph_bound == tools_for(app, "graph")
     assert vector_bound < graph_bound

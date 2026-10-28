@@ -186,22 +186,3 @@ def review_authenticity(driver: Driver, database: str, business_id: str) -> dict
         MATCH (:Business {id: $business_id})<-[:ABOUT]-(r:Review) WHERE r.rating IS NOT NULL
         RETURN round(avg(r.rating), 2) AS avg_rating, count(r) AS reviews""", business_id=business_id)
     return {"business_id": business_id, "overall": overall[0] if overall else {}, "by_reviewer_type": rows}
-
-
-def competing_quotes(driver: Driver, database: str, project_id: str | None = None,
-                     estimate_id: str | None = None) -> list[dict]:
-    """Every quote for one job, including the ones that lost and why.
-
-    Path: Estimate - COMPETED_WITH -> Estimate, each - QUOTED_BY -> Business.
-    """
-    return _run(driver, database, """
-        MATCH (e:Estimate)-[:QUOTED_BY]->(b:Business), (e)-[:FOR_SERVICE]->(s:Service)
-        WHERE ($project_id IS NOT NULL AND e.project_id = $project_id)
-           OR ($estimate_id IS NOT NULL AND (e.id = $estimate_id
-               OR EXISTS { (e)-[:COMPETED_WITH]-(:Estimate {id: $estimate_id}) }))
-        OPTIONAL MATCH (b)<-[:ABOUT]-(r:Review)
-        RETURN e.id AS estimate_id, e.project_id AS project_id, b.id AS business_id,
-               b.name AS business_name, s.name AS service, e.quantity AS quantity, e.unit AS unit,
-               e.total_usd AS quoted_usd, e.final_invoice_usd AS final_invoice_usd, e.status AS status,
-               e.decline_reason AS decline_reason, round(avg(r.rating), 2) AS business_avg_rating
-        ORDER BY quoted_usd""", project_id=project_id, estimate_id=estimate_id)

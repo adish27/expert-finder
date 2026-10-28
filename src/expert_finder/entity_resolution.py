@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from expert_finder.dataset import Dataset
+from expert_finder.formatting import short_name
 
 # Words people use for each trade in "<Name> the <trade>" mentions.
 TRADE_WORDS = {
@@ -32,10 +33,6 @@ class Mention:
     method: str           # "name" | "handle" | "name_the_trade" | "expert_name"
 
 
-def _short(name: str) -> str:
-    return re.sub(r"\s+(LLC|Inc\.?|Co\.)$", "", name).strip()
-
-
 def _alternation(forms) -> str:
     return "|".join(re.escape(f) for f in sorted(set(forms), key=len, reverse=True))
 
@@ -49,7 +46,7 @@ class EntityResolver:
         self._form_method: dict[str, str] = {}
         self._handle_to_business: dict[str, str] = {}
         for b in ds.businesses:
-            for form in (b["name"], _short(b["name"])):
+            for form in (b["name"], short_name(b["name"])):
                 self._form_to_businesses.setdefault(form.lower(), set()).add(b["business_id"])
                 self._form_method[form.lower()] = "name"
             for handle in b["social_accounts"].values():
@@ -151,7 +148,7 @@ class EntityResolver:
         bid = review["business_id"]
         text = f"{review['title'] or ''} {review['text']}"
         name = self.ds.business_by_id[bid]["name"]
-        masked = self._mask(text, [Mention(bid, "business", f, "name") for f in (name, _short(name))])
+        masked = self._mask(text, [Mention(bid, "business", f, "name") for f in (name, short_name(name))])
         return self.resolve_experts(masked, bid)
 
     def resolve_post(self, post: dict) -> list[Mention]:

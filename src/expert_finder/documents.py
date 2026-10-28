@@ -14,6 +14,7 @@ from typing import Any
 from langchain_core.documents import Document
 
 from expert_finder.dataset import Dataset
+from expert_finder.formatting import usd
 
 NAMESPACES = {
     "reviews": "Customer reviews and BBB complaints from Google, Yelp, Angi, Thumbtack, BBB and Houzz.",
@@ -37,10 +38,6 @@ def _epoch(iso: str) -> int:
 def _clean(meta: dict[str, Any]) -> dict[str, Any]:
     """Pinecone metadata accepts str, number, bool and list[str]; drop nulls and empties."""
     return {k: v for k, v in meta.items() if v is not None and v != [] and v != ""}
-
-
-def _usd(x: float) -> str:
-    return f"${x:,.0f}" if x >= 10 else f"${x:,.2f}"
 
 
 def _customer_place(ds: Dataset, customer_id: str | None) -> dict[str, str]:
@@ -128,8 +125,8 @@ def _price_phrase(o: dict) -> str:
     unit = UNIT_PHRASE.get(o["pricing_model"], "per {unit}").format(unit=o["unit"])
     if o["price_high_usd"] == 0:
         return "free"
-    low = "free" if o["price_low_usd"] == 0 else _usd(o["price_low_usd"])
-    return f"{low}-{_usd(o['price_high_usd'])} {unit} (typical {_usd(o['typical_price_usd'])})"
+    low = "free" if o["price_low_usd"] == 0 else usd(o["price_low_usd"])
+    return f"{low}-{usd(o['price_high_usd'])} {unit} (typical {usd(o['typical_price_usd'])})"
 
 
 def business_profile_text(ds: Dataset, b: dict) -> str:
@@ -151,18 +148,18 @@ def business_profile_text(ds: Dataset, b: dict) -> str:
     else:
         lines.append("Licenses: none listed.")
     lines.append(f"Insurance: general liability {'yes' if ins['general_liability'] else 'no'} "
-                 f"({_usd(ins['liability_coverage_usd'])} coverage), workers comp "
+                 f"({usd(ins['liability_coverage_usd'])} coverage), workers comp "
                  f"{'yes' if ins['workers_comp'] else 'no'}, bonded {'yes' if ins['bonded'] else 'no'}.")
     if b["certifications"]:
         lines.append(f"Certifications: {', '.join(b['certifications'])}.")
     lines.append(f"Brands: {', '.join(b['brands'])}. Languages: {', '.join(b['languages'])}.")
     lines.append(f"Payment: {', '.join(b['payment_methods'])}. Financing: {'available' if b['financing_available'] else 'not offered'}.")
     lines.append(f"Warranty: {b['warranty']['workmanship_months']} months workmanship. {b['warranty']['notes']}")
-    fee = (f"service call fee {_usd(pp['service_call_fee_usd'])}"
+    fee = (f"service call fee {usd(pp['service_call_fee_usd'])}"
            + (" (waived with repair)" if pp["service_call_fee_waived_with_repair"] else "")
            if pp["service_call_fee_usd"] else "no service call fee")
-    lines.append(f"Pricing: hourly rate {_usd(pp['hourly_rate_usd'])}, {fee}, minimum charge "
-                 f"{_usd(pp['minimum_charge_usd'])}, {'free estimates' if pp['free_estimates'] else 'estimates may carry a fee'}"
+    lines.append(f"Pricing: hourly rate {usd(pp['hourly_rate_usd'])}, {fee}, minimum charge "
+                 f"{usd(pp['minimum_charge_usd'])}, {'free estimates' if pp['free_estimates'] else 'estimates may carry a fee'}"
                  + (f", discounts: {', '.join(pp['discounts'])}" if pp["discounts"] else "") + ".")
     rt = b["response_time"]
     lines.append(f"Responsiveness: usually replies within {rt['typical_reply_hours']} hours; "
