@@ -119,6 +119,15 @@ def social_documents(ds: Dataset) -> list[Document]:
 
 
 # --- Business profiles ---------------------------------------------------------
+#
+# A profile is indexed twice over: once whole (the "parent", id biz_0001) and once as small
+# section chunks (id biz_0001#service:hvac_tesla_charger). Chunks are what retrieval searches,
+# because one 4KB embedding covering ten services and three staff bios buries any single one of
+# them; the parent is what the model gets back, so it still sees the whole company. Both are
+# built from the same section functions, so the two can never drift apart.
+
+SECTION_HEADINGS = {"overview": "Overview", "credentials": "Licenses, insurance and warranty",
+                    "pricing": "Rates and payment", "service": "Service and price", "team": "Team member"}
 
 
 def _price_phrase(o: dict) -> str:
@@ -129,19 +138,29 @@ def _price_phrase(o: dict) -> str:
     return f"{low}-{usd(o['price_high_usd'])} {unit} (typical {usd(o['typical_price_usd'])})"
 
 
-def business_profile_text(ds: Dataset, b: dict) -> str:
-    cat = ds.category_name
-    pp, em, ins = b["pricing_policy"], b["emergency_service"], b["insurance"]
-    lines = [f"# {b['name']}", b["description"],
-             f"Category: {cat[b['primary_category']]}"
-             + (f"; also {', '.join(cat[c] for c in b['secondary_categories'])}" if b["secondary_categories"] else "")
-             + ".",
-             f"Based in {b['address']['city']}, TX. Serves {', '.join(b['service_area']['cities'])} "
-             f"(about {b['service_area']['radius_miles']} miles).",
-             f"Size: {b['business_size'].replace('_', ' ')}, {b['employee_count']} employees, founded {b['founded_year']}.",
-             f"Hours: Mon-Fri {b['hours']['mon_fri']}, Sat {b['hours']['sat'] or 'closed'}, Sun {b['hours']['sun'] or 'closed'}.",
-             (f"Emergency service: {em['hours']}, {em['after_hours_surcharge_pct']}% after-hours surcharge."
-              if em["available"] else "No emergency service.")]
+def _overview_lines(ds: Dataset, b: dict) -> list[str]:
+    cat, em = ds.category_name, b["emergency_service"]
+    rt = b["response_time"]
+    return [
+        b["description"],
+        f"Category: {cat[b['primary_category']]}"
+        + (f"; also {', '.join(cat[c] for c in b['secondary_categories'])}" if b["secondary_categories"] else "")
+        + ".",
+        f"Based in {b['address']['city']}, TX. Serves {', '.join(b['service_area']['cities'])} "
+        f"(about {b['service_area']['radius_miles']} miles).",
+        f"Size: {b['business_size'].replace('_', ' ')}, {b['employee_count']} employees, founded {b['founded_year']}.",
+        f"Hours: Mon-Fri {b['hours']['mon_fri']}, Sat {b['hours']['sat'] or 'closed'}, Sun {b['hours']['sun'] or 'closed'}.",
+        (f"Emergency service: {em['hours']}, {em['after_hours_surcharge_pct']}% after-hours surcharge."
+         if em["available"] else "No emergency service."),
+        f"Brands: {', '.join(b['brands'])}. Languages: {', '.join(b['languages'])}.",
+        f"Responsiveness: usually replies within {rt['typical_reply_hours']} hours; "
+        f"typically schedules within {rt['typical_days_to_schedule']} days.",
+    ]
+
+
+def _credentials_lines(b: dict) -> list[str]:
+    ins = b["insurance"]
+    lines = []
     if b["licenses"]:
         lines.append("Licenses: " + "; ".join(f"{lic['type']} ({lic['issuer']}) #{lic['number']}, {lic['status']}, "
                                               f"expires {lic['expires']}" for lic in b["licenses"]) + ".")
@@ -152,50 +171,112 @@ def business_profile_text(ds: Dataset, b: dict) -> str:
                  f"{'yes' if ins['workers_comp'] else 'no'}, bonded {'yes' if ins['bonded'] else 'no'}.")
     if b["certifications"]:
         lines.append(f"Certifications: {', '.join(b['certifications'])}.")
-    lines.append(f"Brands: {', '.join(b['brands'])}. Languages: {', '.join(b['languages'])}.")
-    lines.append(f"Payment: {', '.join(b['payment_methods'])}. Financing: {'available' if b['financing_available'] else 'not offered'}.")
     lines.append(f"Warranty: {b['warranty']['workmanship_months']} months workmanship. {b['warranty']['notes']}")
+    return lines
+
+
+def _pricing_lines(b: dict) -> list[str]:
+    pp = b["pricing_policy"]
     fee = (f"service call fee {usd(pp['service_call_fee_usd'])}"
            + (" (waived with repair)" if pp["service_call_fee_waived_with_repair"] else "")
            if pp["service_call_fee_usd"] else "no service call fee")
-    lines.append(f"Pricing: hourly rate {usd(pp['hourly_rate_usd'])}, {fee}, minimum charge "
-                 f"{usd(pp['minimum_charge_usd'])}, {'free estimates' if pp['free_estimates'] else 'estimates may carry a fee'}"
-                 + (f", discounts: {', '.join(pp['discounts'])}" if pp["discounts"] else "") + ".")
-    rt = b["response_time"]
-    lines.append(f"Responsiveness: usually replies within {rt['typical_reply_hours']} hours; "
-                 f"typically schedules within {rt['typical_days_to_schedule']} days.")
+    return [
+        f"Payment: {', '.join(b['payment_methods'])}. Financing: "
+        f"{'available' if b['financing_available'] else 'not offered'}.",
+        f"Pricing: hourly rate {usd(pp['hourly_rate_usd'])}, {fee}, minimum charge "
+        f"{usd(pp['minimum_charge_usd'])}, {'free estimates' if pp['free_estimates'] else 'estimates may carry a fee'}"
+        + (f", discounts: {', '.join(pp['discounts'])}" if pp["discounts"] else "") + ".",
+    ]
+
+
+def _service_line(ds: Dataset, o: dict) -> str:
+    svc = ds.service_by_id[o["service_id"]]
+    extras = []
+    if o["includes"]:
+        extras.append(f"includes {', '.join(o['includes'])}")
+    if o["excludes"]:
+        extras.append(f"excludes {', '.join(o['excludes'])}")
+    extras.append(f"lead time ~{o['lead_time_days']} days")
+    return f"{svc['name']}: {_price_phrase(o)}; {'; '.join(extras)}."
+
+
+def _team_line(e: dict) -> str:
+    return e["bio"] + (f" Goes by {e['goes_by']}." if e["goes_by"] != e["first_name"] else "")
+
+
+def _online_line(b: dict) -> str | None:
+    if not b["social_accounts"]:
+        return None
+    return "Online: " + ", ".join(f"{k} {v}" for k, v in b["social_accounts"].items()) + "."
+
+
+def _sorted_offerings(ds: Dataset, business_id: str) -> list[dict]:
+    return sorted(ds.offerings_of(business_id), key=lambda o: o["service_id"])
+
+
+def business_profile_text(ds: Dataset, b: dict) -> str:
+    """The whole profile: what the model reads once retrieval has matched any part of it."""
+    lines = [f"# {b['name']}", *_overview_lines(ds, b), *_credentials_lines(b), *_pricing_lines(b)]
     lines.append("\n## Services and prices")
-    for o in sorted(ds.offerings_of(b["business_id"]), key=lambda o: o["service_id"]):
-        svc = ds.service_by_id[o["service_id"]]
-        extras = []
-        if o["includes"]:
-            extras.append(f"includes {', '.join(o['includes'])}")
-        if o["excludes"]:
-            extras.append(f"excludes {', '.join(o['excludes'])}")
-        extras.append(f"lead time ~{o['lead_time_days']} days")
-        lines.append(f"- {svc['name']}: {_price_phrase(o)}; {'; '.join(extras)}.")
+    lines += [f"- {_service_line(ds, o)}" for o in _sorted_offerings(ds, b["business_id"])]
     lines.append("\n## Team")
-    for e in ds.experts_of(b["business_id"]):
-        lines.append(f"- {e['bio']}" + (f" Goes by {e['goes_by']}." if e["goes_by"] != e["first_name"] else ""))
-    if b["social_accounts"]:
-        lines.append("\nOnline: " + ", ".join(f"{k} {v}" for k, v in b["social_accounts"].items()) + ".")
+    lines += [f"- {_team_line(e)}" for e in ds.experts_of(b["business_id"])]
+    online = _online_line(b)
+    if online:
+        lines.append("\n" + online)
     return "\n".join(lines)
 
 
+def _business_metadata(ds: Dataset, b: dict) -> dict[str, Any]:
+    """Fields both the parent and its chunks carry, so a metadata filter matches either."""
+    statuses = {lic["status"] for lic in b["licenses"]}
+    return {
+        "business_id": b["business_id"], "business_name": b["name"],
+        "category": b["primary_category"], "secondary_categories": b["secondary_categories"],
+        "cities": b["service_area"]["cities"], "home_city": b["address"]["city"],
+        "emergency_service": b["emergency_service"]["available"],
+        "license_status": "expired" if "expired" in statuses else "active" if statuses else "none",
+        "founded_year": b["founded_year"], "business_size": b["business_size"],
+        "financing_available": b["financing_available"], "languages": b["languages"],
+        "services": [o["service_id"] for o in _sorted_offerings(ds, b["business_id"])],
+    }
+
+
+def business_chunk_documents(ds: Dataset, b: dict) -> list[Document]:
+    """One document per addressable part of a profile.
+
+    Every chunk repeats the company, trade and city, so it stands on its own as an embedding:
+    "tankless water heater install $1,200" is useless without knowing whose price that is.
+    """
+    base = _business_metadata(ds, b)
+    header = f"{b['name']} — {ds.category_name[b['primary_category']]} in {b['address']['city']}, TX."
+    sections: list[tuple[str, dict, list[str]]] = [
+        ("overview", {}, [*_overview_lines(ds, b), *( [_online_line(b)] if _online_line(b) else [])]),
+        ("credentials", {}, _credentials_lines(b)),
+        ("pricing", {}, _pricing_lines(b)),
+    ]
+    for o in _sorted_offerings(ds, b["business_id"]):
+        sections.append(("service", {"service_id": o["service_id"]}, [_service_line(ds, o)]))
+    for e in ds.experts_of(b["business_id"]):
+        sections.append(("team", {"expert_id": e["expert_id"]}, [_team_line(e)]))
+
+    docs = []
+    for section, extra, lines in sections:
+        key = extra.get("service_id") or extra.get("expert_id") or section
+        docs.append(Document(
+            id=f"{b['business_id']}#{section}:{key}" if extra else f"{b['business_id']}#{section}",
+            page_content="\n".join([header, f"{SECTION_HEADINGS[section]}:", *lines]),
+            metadata=_clean({"doc_type": "business_chunk", "section": section, **extra, **base})))
+    return docs
+
+
 def business_documents(ds: Dataset) -> list[Document]:
+    """Parent profiles followed by their chunks; both go into the `businesses` namespace."""
     docs = []
     for b in ds.businesses:
-        statuses = {lic["status"] for lic in b["licenses"]}
-        docs.append(Document(id=b["business_id"], page_content=business_profile_text(ds, b), metadata=_clean({
-            "doc_type": "business_profile", "business_id": b["business_id"], "business_name": b["name"],
-            "category": b["primary_category"], "secondary_categories": b["secondary_categories"],
-            "cities": b["service_area"]["cities"], "home_city": b["address"]["city"],
-            "emergency_service": b["emergency_service"]["available"],
-            "license_status": "expired" if "expired" in statuses else "active" if statuses else "none",
-            "founded_year": b["founded_year"], "business_size": b["business_size"],
-            "financing_available": b["financing_available"], "languages": b["languages"],
-            "services": [o["service_id"] for o in ds.offerings_of(b["business_id"])],
-        })))
+        docs.append(Document(id=b["business_id"], page_content=business_profile_text(ds, b),
+                             metadata=_clean({"doc_type": "business_profile", **_business_metadata(ds, b)})))
+        docs += business_chunk_documents(ds, b)
     return docs
 
 

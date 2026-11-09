@@ -39,6 +39,16 @@ class Settings(BaseSettings):
 
     top_k: int = 6
     tool_loadout_k: int = 3
+    # Alternative phrasings searched alongside the question; 0 disables query expansion, which is
+    # how an evaluation run measures what it buys.
+    multi_query_rewrites: int = 2
+    # Profile chunks to consider per business slot. Several chunks of one company can all match,
+    # so searching k*overfetch chunks is what makes k distinct businesses come back.
+    business_chunk_overfetch: int = 4
+    # List price per million tokens for `chat_model`, used only to report what an evaluation run
+    # cost. Re-check these against current pricing whenever the model changes.
+    price_per_mtok_input: float = 0.40
+    price_per_mtok_output: float = 1.60
 
 
 @lru_cache

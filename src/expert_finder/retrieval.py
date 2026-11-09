@@ -1,6 +1,10 @@
 """Evidence retrieval in two modes.
 
-VectorRetriever: semantic search over Pinecone namespaces.
+VectorRetriever: semantic search over Pinecone namespaces. Two refinements sit here rather than
+                 in either mode, so both modes get them and a vector-vs-graph comparison still
+                 measures only the graph: the question is expanded into several phrasings whose
+                 hits are fused (LLMQueryExpander), and business profiles are matched as small
+                 section chunks but returned whole (parent-document retrieval).
 GraphRetriever:  the same vector hits, then expanded through Neo4j to pull in the connected
                  businesses, people, quotes and whole discussion threads.
 
@@ -13,12 +17,14 @@ evaluation verify citations and the UI link to sources.
 from __future__ import annotations
 
 import time
-from typing import Any
+from typing import Any, Protocol
 
+from langsmith import traceable
 from neo4j import Driver
 from pydantic import BaseModel, Field
 
 from expert_finder import graph_queries as gq
+from expert_finder import tracing
 from expert_finder.documents import NAMESPACES
 from expert_finder.formatting import usd
 from expert_finder.vector_store import VectorIndex
@@ -91,18 +97,98 @@ def _license_phrase(status: str, required: bool) -> str:
     return "no license on file (none required for this trade)" if not required else "NO LICENSE on file"
 
 
+# --- Query expansion ----------------------------------------------------------------------------
+
+
+class QueryExpander(Protocol):
+    def expand(self, query: str) -> list[str]:
+        """The original query first, then alternative phrasings to search as well."""
+        ...
+
+
+class _Rewrites(BaseModel):
+    """Structured output, so the rewrites never have to be parsed out of prose."""
+
+    queries: list[str] = Field(description="Alternative search phrasings, one per line, no numbering.")
+
+
+REWRITE_PROMPT = """A homeowner asked: "{query}"
+
+Write {n} different search queries that would find relevant customer reviews, neighbourhood posts and business profiles for this need. Vary the wording: use the trade's own terms for the symptom, name the likely repair or service, and keep one phrasing close to how a customer would say it. Each query stands alone and mentions no business by name."""
+
+
+class LLMQueryExpander:
+    """Rewrite a question into several phrasings before searching.
+
+    Vague questions ("my AC is blowing warm air") and the text that answers them ("recharged the
+    refrigerant", "condenser fan motor replaced") often share few words, so one embedding of the
+    question misses them. Rewrites are cached per query because several tools retrieve against the
+    same question within one turn, and a rewrite is worth paying for once.
+    """
+
+    def __init__(self, model: Any, n: int = 2):
+        self.model = model
+        self.n = n
+        self._cache: dict[str, list[str]] = {}
+
+    @traceable(name="query_expansion", process_inputs=tracing.index_inputs,
+               process_outputs=tracing.expansion_outputs)
+    def expand(self, query: str) -> list[str]:
+        if self.n < 1:
+            return [query]
+        if query not in self._cache:
+            try:
+                # Bound here rather than in __init__ so that a model which cannot produce
+                # structured output costs nothing until a query is actually expanded.
+                result = self.model.with_structured_output(_Rewrites).invoke(
+                    REWRITE_PROMPT.format(query=query, n=self.n))
+                extra = [q.strip() for q in result.queries if q.strip() and q.strip() != query]
+            except Exception:
+                # Retrieval still works on the original query, so a failed rewrite must not take
+                # the whole answer down with it; bundle.stats["queries"] stays 1 when this happens.
+                extra = []
+            self._cache[query] = [query, *extra[:self.n]]
+        return self._cache[query]
+
+
 # --- Vector retrieval ---------------------------------------------------------------------------
 
 KIND_BY_NAMESPACE = {"reviews": "review", "social": "post", "businesses": "business"}
+
+# Metadata worth carrying into an evidence item: what the UI shows and the evaluation filters on.
+_KEEP_METADATA = ("platform", "rating", "business_id", "business_name", "category", "created_date",
+                  "community", "post_type", "city", "neighborhood", "review_type", "cities",
+                  "license_status", "emergency_service")
+
+# Business profiles are indexed as small section chunks plus the whole profile (see documents.py).
+# Chunks are what we search; the parent profile is what the model reads.
+CHUNKED_NAMESPACE = "businesses"
+
+
+def _chunk_label(doc) -> str:
+    """What part of a profile matched, in words, for the evidence card and the prompt."""
+    section = doc.metadata.get("section", "profile")
+    body = doc.page_content.splitlines()[2:]
+    first = body[0] if body else ""
+    if section == "service":
+        return first.split(":")[0]
+    if section == "team":
+        return first.split(" is ")[0]
+    return section
 
 
 class VectorRetriever:
     mode = "vector"
 
-    def __init__(self, index: VectorIndex, k: int = 6):
+    def __init__(self, index: VectorIndex, k: int = 6, expander: QueryExpander | None = None,
+                 chunk_overfetch: int = 4):
         self.index = index
         self.k = k
+        self.expander = expander
+        self.chunk_overfetch = chunk_overfetch
 
+    @traceable(run_type="retriever", name="vector_retrieval", process_inputs=tracing.retriever_inputs,
+               process_outputs=tracing.bundle_outputs)
     def retrieve(self, query: str, namespaces: tuple[str, ...] = DEFAULT_NAMESPACES, k: int | None = None,
                  filters: dict[str, dict] | None = None, refs: _RefMaker | None = None) -> EvidenceBundle:
         """Search each namespace and turn the hits into evidence.
@@ -114,26 +200,85 @@ class VectorRetriever:
         refs = refs or _RefMaker()
         started = time.perf_counter()
         bundle = EvidenceBundle(query=query, mode=self.mode)
-        per_namespace = {}
+        queries = self.expander.expand(query) if self.expander else [query]
+        per_namespace: dict[str, int] = {}
         for ns in namespaces:
             if ns not in NAMESPACES:
                 raise ValueError(f"unknown namespace {ns!r}")
-            hits = self.index.search(query, ns, k=k or self.k, filter=(filters or {}).get(ns))
-            per_namespace[ns] = len(hits)
-            for doc, score in hits:
-                bundle.items.append(self._to_evidence(ns, doc, score, refs))
+            top_k = k or self.k
+            if ns == CHUNKED_NAMESPACE:
+                items = self._business_evidence(queries, top_k, (filters or {}).get(ns), refs)
+            else:
+                items = [self._to_evidence(ns, doc, score, refs)
+                         for doc, score in self._search(ns, queries, top_k, (filters or {}).get(ns))]
+            per_namespace[ns] = len(items)
+            bundle.items += items
         bundle.stats = {"namespaces": per_namespace, "items": len(bundle.items),
+                        "queries": len(queries),
                         "retrieval_ms": round((time.perf_counter() - started) * 1000)}
+        if len(queries) > 1:
+            bundle.stats["rewrites"] = queries[1:]
         return bundle
+
+    def _search(self, namespace: str, queries: list[str], k: int,
+                filter: dict | None) -> list[tuple[Any, float]]:
+        """Run every query variant against one namespace and fuse the hits.
+
+        Scores from a single embedding model and namespace are directly comparable, so a document
+        found by two phrasings keeps its best score rather than being counted twice. The fused list
+        is cut back to k, so expansion changes which k documents are returned, not how many.
+        """
+        best: dict[str, tuple[Any, float]] = {}
+        for q in queries:
+            for doc, score in self.index.search(q, namespace, k=k, filter=filter):
+                current = best.get(doc.id)
+                if current is None or score > current[1]:
+                    best[doc.id] = (doc, score)
+        return sorted(best.values(), key=lambda pair: -pair[1])[:k]
+
+    def _business_evidence(self, queries: list[str], k: int, filter: dict | None,
+                           refs: _RefMaker) -> list[Evidence]:
+        """Match profile chunks, then return one whole profile per business.
+
+        A hit on a single priced service is the precise signal; the full profile is what the model
+        needs to answer with (licences, insurance, the rest of the prices, who works there). So we
+        overfetch chunks, collapse them to the best k distinct businesses, and fetch those parents.
+        """
+        chunk_filter = {**(filter or {}), "doc_type": "business_chunk"}
+        hits = self._search(CHUNKED_NAMESPACE, queries, k * self.chunk_overfetch, chunk_filter)
+        matched: dict[str, dict[str, Any]] = {}
+        for doc, score in hits:
+            entry = matched.setdefault(doc.metadata["business_id"],
+                                       {"score": score, "sections": [], "metadata": doc.metadata})
+            entry["score"] = max(entry["score"], score)
+            label = _chunk_label(doc)
+            if label not in entry["sections"]:
+                entry["sections"].append(label)
+        chosen = sorted(matched.items(), key=lambda kv: -kv[1]["score"])[:k]
+        parents = self.index.fetch([bid for bid, _ in chosen], CHUNKED_NAMESPACE)
+
+        items = []
+        for business_id, entry in chosen:
+            parent = parents.get(business_id)
+            # Without the parent (an index built before profiles were chunked) the chunk metadata
+            # still identifies the business, so fall back to it rather than dropping the hit.
+            md = parent.metadata if parent else entry["metadata"]
+            text = parent.page_content.strip() if parent else ""
+            matched_on = ", ".join(entry["sections"][:4])
+            items.append(Evidence(
+                ref=refs.next("business"), kind="business", via="vector",
+                text=f"Matched on: {matched_on}.\n{text}" if text else f"Matched on: {matched_on}.",
+                source={"id": business_id, "namespace": CHUNKED_NAMESPACE,
+                        "matched_sections": entry["sections"],
+                        **{key: md[key] for key in _KEEP_METADATA if key in md}},
+                score=round(entry["score"], 3)))
+        return items
 
     @staticmethod
     def _to_evidence(namespace: str, doc, score: float, refs: _RefMaker) -> Evidence:
         kind = KIND_BY_NAMESPACE[namespace]
         md = doc.metadata
-        keep = ("platform", "rating", "business_id", "business_name", "category", "created_date",
-                "community", "post_type", "city", "neighborhood", "review_type", "cities",
-                "license_status", "emergency_service")
-        source = {"id": doc.id, "namespace": namespace, **{k: md[k] for k in keep if k in md}}
+        source = {"id": doc.id, "namespace": namespace, **{k: md[k] for k in _KEEP_METADATA if k in md}}
         return Evidence(ref=refs.next(kind), kind=kind, text=doc.page_content.strip(), source=source,
                         score=round(score, 3), via="vector")
 
@@ -147,12 +292,17 @@ class GraphRetriever:
     mode = "graph"
 
     def __init__(self, index: VectorIndex, driver: Driver, database: str, k: int = 6,
-                 thread_limit: int = 10):
-        self.vector = VectorRetriever(index, k=k)
+                 thread_limit: int = 10, expander: QueryExpander | None = None,
+                 chunk_overfetch: int = 4):
+        # Graph mode wraps the same vector stage, so query expansion and profile chunking apply
+        # identically in both modes and the comparison still isolates the graph.
+        self.vector = VectorRetriever(index, k=k, expander=expander, chunk_overfetch=chunk_overfetch)
         self.driver = driver
         self.database = database
         self.thread_limit = thread_limit
 
+    @traceable(run_type="retriever", name="graph_retrieval", process_inputs=tracing.retriever_inputs,
+               process_outputs=tracing.bundle_outputs)
     def retrieve(self, query: str, namespaces: tuple[str, ...] = DEFAULT_NAMESPACES, k: int | None = None,
                  filters: dict[str, dict] | None = None, service_ids: list[str] | None = None) -> EvidenceBundle:
         refs = _RefMaker()

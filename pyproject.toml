@@ -1,7 +1,7 @@
 [project]
 name = "expert-finder"
 version = "0.1.0"
-description = "Home services expert finder: Graph RAG with Chroma, Neo4j and LangChain"
+description = "Home services expert finder: vector and graph RAG over Pinecone, Neo4j and SQLite"
 readme = "README.md"
 authors = [
     { name = "Adish" }
@@ -13,6 +13,7 @@ dependencies = [
     "langchain-core>=1.7.0",
     "langchain-openai>=1.7.2",
     "langchain-pinecone>=0.2.13",
+    "langsmith>=0.14.12",
     "neo4j>=6.4.1",
     "pinecone>=7.3.0",
     "pydantic>=2.14.1",

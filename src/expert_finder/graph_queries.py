@@ -13,7 +13,15 @@ from __future__ import annotations
 
 from typing import Any
 
+from langsmith import traceable
 from neo4j import Driver
+
+from expert_finder import tracing
+
+# Every Cypher call is traced: without it, the graph expansion behind one answer arrives in
+# LangSmith as a single opaque span inside the tool that asked for it. Decorated per query rather
+# than on _run, so each span carries the name of the question it answers.
+_traced = traceable(process_inputs=tracing.query_inputs, process_outputs=tracing.rows_outputs)
 
 
 def _run(driver: Driver, database: str, cypher: str, **params) -> list[dict[str, Any]]:
@@ -81,18 +89,22 @@ RETURN b.id AS business_id, b.name AS business_name, b.category AS category, b.p
 """
 
 
+@_traced
 def expand_reviews(driver: Driver, database: str, review_ids: list[str]) -> list[dict]:
     return _run(driver, database, EXPAND_REVIEWS, ids=review_ids) if review_ids else []
 
 
+@_traced
 def expand_posts(driver: Driver, database: str, post_ids: list[str]) -> list[dict]:
     return _run(driver, database, EXPAND_POSTS, ids=post_ids) if post_ids else []
 
 
+@_traced
 def expand_threads(driver: Driver, database: str, post_ids: list[str], limit: int = 12) -> list[dict]:
     return _run(driver, database, EXPAND_THREADS, ids=post_ids, limit=limit) if post_ids else []
 
 
+@_traced
 def business_context(driver: Driver, database: str, business_ids: list[str],
                      service_ids: list[str] | None = None) -> list[dict]:
     return _run(driver, database, BUSINESS_CONTEXT, ids=business_ids,
@@ -102,6 +114,7 @@ def business_context(driver: Driver, database: str, business_ids: list[str],
 # --- Graph-native queries ---------------------------------------------------------------------
 
 
+@_traced
 def neighbor_recommendations(driver: Driver, database: str, neighborhood: str | None = None,
                              city: str | None = None, category: str | None = None,
                              limit: int = 5) -> list[dict]:
@@ -138,6 +151,7 @@ def neighbor_recommendations(driver: Driver, database: str, neighborhood: str | 
         LIMIT $limit""", neighborhood=neighborhood, city=city, category=category, limit=limit)
 
 
+@_traced
 def praised_experts(driver: Driver, database: str, business_id: str, min_rating: int = 4,
                     limit: int = 5) -> list[dict]:
     """Which named people at a business appear in good (or bad) reviews.
@@ -160,6 +174,7 @@ def praised_experts(driver: Driver, database: str, business_id: str, min_rating:
         LIMIT $limit""", business_id=business_id, min_rating=min_rating, limit=limit)
 
 
+@_traced
 def review_authenticity(driver: Driver, database: str, business_id: str) -> dict:
     """Split a business's ratings by whether the reviewer is traceable to a real customer.
 

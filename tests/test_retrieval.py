@@ -3,7 +3,7 @@
 import pytest
 
 from expert_finder.config import get_settings
-from expert_finder.retrieval import DEFAULT_NAMESPACES, EvidenceBundle, GraphRetriever, VectorRetriever, _license_phrase
+from expert_finder.retrieval import CHUNKED_NAMESPACE, DEFAULT_NAMESPACES, EvidenceBundle, GraphRetriever, VectorRetriever
 
 pytestmark = pytest.mark.integration
 
@@ -52,12 +52,6 @@ def graph_bundle(index, driver, settings):
         QUERY, namespaces=("social", "reviews"))
 
 
-def test_license_phrase_distinguishes_trades_without_a_license_requirement():
-    assert "none required" in _license_phrase("none", required=False)
-    assert _license_phrase("none", required=True) == "NO LICENSE on file"
-    assert _license_phrase("expired", required=True) == "EXPIRED license"
-
-
 def test_vector_bundle_has_unique_refs_and_real_record_ids(vector_bundle):
     assert vector_bundle.mode == "vector" and vector_bundle.items
     refs = [i.ref for i in vector_bundle.items]
@@ -67,15 +61,23 @@ def test_vector_bundle_has_unique_refs_and_real_record_ids(vector_bundle):
         assert i.ref[0] in "RPB"
 
 
-def test_vector_retrieval_rejects_unknown_namespace(index):
-    with pytest.raises(ValueError, match="unknown namespace"):
-        VectorRetriever(index).retrieve(QUERY, namespaces=("nope",))
-
-
 def test_pinecone_filters_are_applied(index):
     bundle = VectorRetriever(index, k=5).retrieve("AC stopped cooling", namespaces=("reviews",),
                                                   filters={"reviews": {"category": "hvac"}})
     assert bundle.items and all(i.source["category"] == "hvac" for i in bundle.items)
+
+
+def test_business_profiles_come_back_whole_from_a_chunk_match(index):
+    """Chunks are what match; the model must still receive the complete profile."""
+    bundle = VectorRetriever(index, k=3).retrieve("installs tankless water heaters and speaks Spanish",
+                                                  namespaces=(CHUNKED_NAMESPACE,))
+    assert bundle.items and len(bundle.items) <= 3
+    ids = [i.record_id for i in bundle.items]
+    assert len(ids) == len(set(ids)), "one profile per business, however many of its chunks matched"
+    for item in bundle.items:
+        assert item.record_id.startswith("biz_"), "the ref resolves to the business, not the chunk"
+        assert item.source["matched_sections"], "the matching sections are reported"
+        assert "## Services and prices" in item.text and "## Team" in item.text
 
 
 def test_graph_mode_is_a_superset_of_vector_mode(vector_bundle, graph_bundle):

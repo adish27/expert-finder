@@ -22,9 +22,21 @@ PAGES = [HOME, COMPARE]
 
 @pytest.fixture(scope="module", autouse=True)
 def require_stores():
+    """Both pages report unreachable stores instead of rendering, so every store must be up.
+
+    Neo4j is checked too: without it the pages render a store warning and no widgets, which
+    would fail these tests for an environmental reason rather than a regression.
+    """
     s = get_settings()
     if not (s.openai_api_key and s.pinecone_api_key and (s.storage_dir / "home_services.db").exists()):
         pytest.skip("needs credentials and a built SQLite store")
+    from expert_finder.graph_db import neo4j_driver
+
+    try:
+        with neo4j_driver(s) as driver:
+            driver.verify_connectivity()
+    except Exception as e:
+        pytest.skip(f"Neo4j unavailable: {type(e).__name__}")
 
 
 @pytest.mark.parametrize("page", PAGES)

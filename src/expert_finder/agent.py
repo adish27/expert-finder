@@ -16,6 +16,7 @@ from typing import Any
 from langchain_core.messages import AIMessage, ToolMessage
 from langgraph.checkpoint.memory import InMemorySaver
 
+from expert_finder import tracing
 from expert_finder.app import ExpertFinder, Mode
 from expert_finder.tools import ToolRecorder, build_tools
 
@@ -140,7 +141,7 @@ def run_agent(app: ExpertFinder, question: str, mode: Mode = "graph", thread_id:
 
     started = time.perf_counter()
     state = agent.invoke({"messages": [{"role": "user", "content": question}]},
-                         config={"configurable": {"thread_id": thread_id}})
+                         config=tracing.agent_config(mode, thread_id, app.settings))
     elapsed = round((time.perf_counter() - started) * 1000)
 
     messages = state["messages"]

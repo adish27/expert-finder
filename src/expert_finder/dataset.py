@@ -57,6 +57,14 @@ class Dataset:
         return {p["post_id"]: p for p in self.posts}
 
     @cached_property
+    def review_by_id(self) -> dict[str, dict]:
+        return {r["review_id"]: r for r in self.reviews}
+
+    @cached_property
+    def expert_by_id(self) -> dict[str, dict]:
+        return {e["expert_id"]: e for e in self.experts}
+
+    @cached_property
     def category_name(self) -> dict[str, str]:
         return {c["category_id"]: c["name"] for c in self.categories}
 

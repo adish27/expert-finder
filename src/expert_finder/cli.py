@@ -101,6 +101,35 @@ def mention_report() -> None:
     print("review experts:", json.dumps(evaluate_review_mentions(ds, r, gt / "review_expert_mentions.jsonl"), indent=1))
 
 
+def run_eval(modes: list[str], limit: int | None, judge: bool, upload: bool,
+             rewrites: int | None, questions_only: bool, kinds: list[str] | None) -> None:
+    """Score both retrieval modes on questions generated from the hidden ground truth."""
+    from expert_finder.app import ExpertFinder
+    from expert_finder.dataset import Dataset as _Dataset
+    from expert_finder.evaluation import GroundTruth, build_questions, format_report, run_evaluation
+
+    s = get_settings()
+    if rewrites is not None:
+        s = s.model_copy(update={"multi_query_rewrites": rewrites})
+
+    if questions_only:
+        ds = _Dataset.load(s.data_dir)
+        chosen = [q for q in build_questions(ds, GroundTruth.load(ds, s.data_dir))
+                  if kinds is None or q.kind in kinds]
+        for q in chosen[:limit]:
+            print(f"[{q.kind}] {q.id}\n  {q.question}\n  expected: {json.dumps(q.reference)}")
+        return
+
+    app = ExpertFinder(s)
+    try:
+        report = run_evaluation(app, modes=tuple(modes), limit=limit, judge=judge, upload=upload,
+                                kinds=tuple(kinds) if kinds else None)
+    finally:
+        app.close()
+    print()
+    print(format_report(report))
+
+
 def ask(question: str, mode: str, show_evidence: bool, loadout: bool) -> None:
     from expert_finder.agent import run_agent
     from expert_finder.app import ExpertFinder
@@ -145,6 +174,20 @@ def main() -> None:
     p = sub.add_parser("build-graph", help="build the Neo4j knowledge graph from the dataset")
     p.add_argument("--reset", action="store_true", help="delete this project's nodes before building")
     sub.add_parser("mention-report", help="score entity resolution against ground truth")
+    p = sub.add_parser("eval", help="score vector and graph modes against ground truth")
+    p.add_argument("--mode", choices=["vector", "graph"], action="append",
+                   help="limit to one mode (repeatable); default: both")
+    p.add_argument("--limit", type=int, help="only the first N questions, applied after --kind")
+    p.add_argument("--kind", choices=["trust", "recommend", "neighborhood", "expert", "quote"],
+                   action="append", help="limit to one kind of question (repeatable)")
+    p.add_argument("--no-judge", action="store_true",
+                   help="skip the LLM-judged scores (trust problems, price verdict)")
+    p.add_argument("--no-upload", action="store_true",
+                   help="score locally instead of creating a LangSmith experiment")
+    p.add_argument("--rewrites", type=int,
+                   help="override multi_query_rewrites, e.g. 0 to measure retrieval without it")
+    p.add_argument("--questions", action="store_true",
+                   help="print the generated question set and exit, without running the agent")
     p = sub.add_parser("ask", help="ask the agent one question")
     p.add_argument("question")
     p.add_argument("--mode", choices=["vector", "graph"], default="graph")
@@ -167,6 +210,9 @@ def main() -> None:
         build_graph(args.reset)
     elif args.cmd == "mention-report":
         mention_report()
+    elif args.cmd == "eval":
+        run_eval(args.mode or ["vector", "graph"], args.limit, not args.no_judge,
+                 not args.no_upload, args.rewrites, args.questions, args.kind)
     elif args.cmd == "ask":
         ask(args.question, args.mode, args.evidence, args.loadout)
     elif args.cmd == "search":

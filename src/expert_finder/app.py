@@ -19,6 +19,7 @@ class ExpertFinder:
         self.settings = settings or get_settings()
         self._index = None
         self._driver = None
+        self._expander = None
         # LangGraph runs tools in a thread pool and SQLite connections belong to one thread, so
         # each thread gets its own read-only connection. The Neo4j driver and Pinecone client are
         # thread-safe and stay shared.
@@ -58,11 +59,19 @@ class ExpertFinder:
     # --- components -----------------------------------------------------------
 
     def retriever(self, mode: Mode):
-        from expert_finder.retrieval import GraphRetriever, VectorRetriever
+        from expert_finder.retrieval import GraphRetriever, LLMQueryExpander, VectorRetriever
 
+        s = self.settings
+        # One expander per container, so its rewrite cache is shared across tools and turns.
+        # Needs the chat model, which needs a key; without one, retrieval cannot run at all, so
+        # building tools stays possible rather than failing here.
+        if s.multi_query_rewrites and self._expander is None and s.openai_api_key:
+            self._expander = LLMQueryExpander(self.chat_model(), n=s.multi_query_rewrites)
+        shared = {"k": s.top_k, "expander": self._expander,
+                  "chunk_overfetch": s.business_chunk_overfetch}
         if mode == "graph":
-            return GraphRetriever(self.index, self.driver, self.database, k=self.settings.top_k)
-        return VectorRetriever(self.index, k=self.settings.top_k)
+            return GraphRetriever(self.index, self.driver, self.database, **shared)
+        return VectorRetriever(self.index, **shared)
 
     def chat_model(self, temperature: float = 0.0):
         from langchain_openai import ChatOpenAI
